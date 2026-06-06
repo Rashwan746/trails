@@ -1,10 +1,15 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
 import '../models/place_model.dart';
+import '../providers/map_state_provider.dart';
 import '../services/places_service.dart';
+import '../services/favorites_service.dart';
 import '../services/location_service.dart';
 import '../services/analytics_service.dart';
 import 'overview_screen.dart';
@@ -17,464 +22,742 @@ class MapScreen extends StatefulWidget {
   State<MapScreen> createState() => _MapScreenState();
 }
 
-class _MapScreenState extends State<MapScreen> {
-  final MapController _mapController = MapController();
-  final _placesService = PlacesService();
-  final _locationService = LocationService();
-  final _analytics = AnalyticsService();
+class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
+  final MapController      _mapController  = MapController();
+  final _placesService   = PlacesService();
+  final _favoritesService = FavoritesService();
+  final _locationService  = LocationService();
+  final _analytics        = AnalyticsService();
+  final _searchCtrl       = TextEditingController();
+  final _searchFocus      = FocusNode();
 
-  List<Place> _places = [];
-  Place? _selectedPlace;
-  bool _loading = true;
-  String? _selectedCategory;
-  LatLng? _userLocation;
+  List<Place> _allPlaces      = [];
+  List<Place> _filteredPlaces = [];
+  Place?      _selectedPlace;
+  bool        _loading        = true;
+  bool        _searchActive   = false;
+  String?     _selectedCategory;
+  LatLng?     _userLocation;
+  bool        _isFav          = false;
 
-  static const _egyptCenter = LatLng(26.8206, 30.8025);
-  static const _defaultZoom = 6.0;
+  // top-bar slide-up when a place is selected
+  late AnimationController _barAnimCtrl;
+  late Animation<Offset>   _barSlide;
+
+  // bottom card slide-up
+  late AnimationController _cardAnimCtrl;
+  late Animation<Offset>   _cardSlide;
+
+  static const _cairoCenter = LatLng(30.0444, 31.2357);
+
+  // glass dark colour shared by top bar + bottom card
+  static const _glassBg = Color(0xCC000000); // ~80 % black
+
+  static const _categories = [
+    ('All',         null,         Icons.public_rounded,          Color(0xFFE8750A)),
+    ('Attractions', 'historical', Icons.account_balance_rounded, Color(0xFF8B5E3C)),
+    ('Dining',      'restaurant', Icons.restaurant_rounded,      Color(0xFFE11D48)),
+    ('Hotels',      'hotel',      Icons.bed_rounded,             Color(0xFF0D9488)),
+    ('Nature',      'nature',     Icons.forest_rounded,          Color(0xFF16A34A)),
+    ('Beaches',     'beach',      Icons.beach_access_rounded,    Color(0xFF0891B2)),
+    ('Desert',      'desert',     Icons.wb_sunny_rounded,        Color(0xFFD97706)),
+    ('Museums',     'museum',     Icons.museum_rounded,          Color(0xFF7C3AED)),
+    ('Religious',   'religious',  Icons.mosque_rounded,          Color(0xFF059669)),
+    ('Shops',       'market',     Icons.storefront_rounded,      Color(0xFFDC2626)),
+  ];
 
   @override
   void initState() {
     super.initState();
     _analytics.screenView('map');
+
+    _barAnimCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
+    _barSlide = Tween<Offset>(begin: Offset.zero, end: const Offset(0, -1.5))
+        .animate(CurvedAnimation(parent: _barAnimCtrl, curve: Curves.easeInCubic));
+
+    _cardAnimCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 340));
+    _cardSlide = Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero)
+        .animate(CurvedAnimation(parent: _cardAnimCtrl, curve: Curves.easeOutCubic));
+
+    _searchCtrl.addListener(_onSearch);
     _loadUserLocation();
     _loadPlaces();
   }
 
+  @override
+  void dispose() {
+    _barAnimCtrl.dispose();
+    _cardAnimCtrl.dispose();
+    _searchCtrl.dispose();
+    _searchFocus.dispose();
+    super.dispose();
+  }
+
+  void _onSearch() {
+    final q = _searchCtrl.text.toLowerCase().trim();
+    setState(() {
+      _filteredPlaces = q.isEmpty
+          ? List.from(_allPlaces)
+          : _allPlaces.where((p) => p.getName('en').toLowerCase().contains(q)).toList();
+    });
+  }
+
   Future<void> _loadUserLocation() async {
-    final position = await _locationService.getCurrentPosition();
-    if (position != null && mounted) {
-      setState(() =>
-          _userLocation = LatLng(position.latitude, position.longitude));
-    }
+    final pos = await _locationService.getCurrentPosition();
+    if (pos != null && mounted) setState(() => _userLocation = LatLng(pos.latitude, pos.longitude));
   }
 
   Future<void> _loadPlaces() async {
+    setState(() => _loading = true);
     try {
-      final res = await _placesService.getPlaces(
-        category: _selectedCategory,
-        limit: 50,
-      );
-      if (mounted) {
-        setState(() {
-          _places = res['places'];
-          _loading = false;
-        });
-      }
+      final res = await _placesService.getPlaces(category: _selectedCategory, limit: 50);
+      if (!mounted) return;
+      final places = res['places'] as List<Place>;
+      setState(() { _allPlaces = places; _filteredPlaces = List.from(places); _loading = false; });
       if (widget.focusPlace != null) {
-        Future.delayed(const Duration(milliseconds: 300), () {
-          _animateToPlace(widget.focusPlace!);
-        });
+        Future.delayed(const Duration(milliseconds: 300), () => _animateToPlace(widget.focusPlace!));
       }
-    } catch (e) {
+    } catch (_) {
       if (mounted) setState(() => _loading = false);
     }
   }
 
   void _animateToPlace(Place place) {
-    _mapController.move(
-      LatLng(place.location.latitude, place.location.longitude),
-      13.0,
-    );
-    setState(() => _selectedPlace = place);
+    _mapController.move(LatLng(place.location.latitude, place.location.longitude), 13.0);
+    _selectPlace(place);
+  }
+
+  Future<void> _selectPlace(Place place) async {
+    _searchFocus.unfocus();
+    setState(() { _selectedPlace = place; _searchActive = false; _isFav = false; });
+    // hide top bar + bottom nav, show card
+    _barAnimCtrl.forward();
+    _cardAnimCtrl.forward(from: 0);
+    context.read<MapStateProvider>().selectPlace();
+    // check favourite
+    try {
+      final fav = await _favoritesService.isFavorite(place.id.toString());
+      if (mounted) setState(() => _isFav = fav);
+    } catch (_) {}
+  }
+
+  void _deselectPlace() {
+    _cardAnimCtrl.reverse().then((_) {
+      if (mounted) setState(() => _selectedPlace = null);
+    });
+    _barAnimCtrl.reverse();
+    context.read<MapStateProvider>().deselectPlace(); // bring nav bar back
   }
 
   void _goToMyLocation() {
-    if (_userLocation != null) {
-      _mapController.move(_userLocation!, 13.0);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Could not get your location.')),
-      );
+    if (_userLocation != null) _mapController.move(_userLocation!, 14.0);
+  }
+
+  Future<void> _toggleFav() async {
+    if (_selectedPlace == null) return;
+    try {
+      final nowFav = await _favoritesService.toggleFavorite(_selectedPlace!.id.toString());
+      if (mounted) setState(() => _isFav = nowFav);
+      _showSnack(nowFav ? 'Added to favourites ❤️' : 'Removed from favourites');
+    } catch (_) {
+      _showSnack('Sign in to save places');
     }
   }
 
-  Color _categoryColor(String cat) {
-    switch (cat) {
-      case 'historical': return const Color(0xFFFF6B35);
-      case 'beach': return const Color(0xFF00B4D8);
-      case 'desert': return const Color(0xFFF4A261);
-      case 'museum': return const Color(0xFF9B59B6);
-      case 'religious': return const Color(0xFF27AE60);
-      case 'nature': return const Color(0xFF2ECC71);
-      case 'market': return const Color(0xFFE74C3C);
-      case 'cruise':      return const Color(0xFF3498DB);
-      case 'restaurant':  return const Color(0xFFE11D48);
-      case 'hotel':       return const Color(0xFF0D9488);
-      default: return AppColors.primary;
-    }
+  void _sharePlace() {
+    if (_selectedPlace == null) return;
+    final name = _selectedPlace!.getName('en');
+    final url  = 'http://localhost:8081';
+    final text = '$name — Discover Egypt\n$url';
+    Clipboard.setData(ClipboardData(text: text));
+    _showSnack('Link copied to clipboard 🔗');
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          // ── OpenStreetMap ──────────────────────────────────────────
-          FlutterMap(
-            mapController: _mapController,
-            options: MapOptions(
-              initialCenter: widget.focusPlace != null
-                  ? LatLng(widget.focusPlace!.location.latitude,
-                      widget.focusPlace!.location.longitude)
-                  : _egyptCenter,
-              initialZoom: widget.focusPlace != null ? 13.0 : _defaultZoom,
-              onTap: (_, __) => setState(() => _selectedPlace = null),
-            ),
-            children: [
-              TileLayer(
-                urlTemplate:
-                    'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-                subdomains: const ['a', 'b', 'c', 'd'],
-                userAgentPackageName: 'com.discover.egypt',
-                maxZoom: 20,
-                fallbackUrl:
-                    'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                tileBuilder: (context, tileWidget, tile) => tileWidget,
-              ),
-              // User location marker
-              if (_userLocation != null)
-                MarkerLayer(markers: [
-                  Marker(
-                    point: _userLocation!,
-                    width: 20,
-                    height: 20,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.blue,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 2.5),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.blue.withOpacity(0.4),
-                            blurRadius: 8,
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                ]),
-              // Place markers
-              MarkerLayer(
-                markers: _places.map((place) {
-                  final isSelected = _selectedPlace?.id == place.id;
-                  final color = _categoryColor(place.category);
-                  return Marker(
-                    point: LatLng(
-                        place.location.latitude, place.location.longitude),
-                    width: isSelected ? 44 : 36,
-                    height: isSelected ? 44 : 36,
-                    child: GestureDetector(
-                      onTap: () => setState(() => _selectedPlace = place),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        decoration: BoxDecoration(
-                          color: isSelected ? color : color.withOpacity(0.85),
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Colors.white,
-                            width: isSelected ? 3 : 2,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: color.withOpacity(0.5),
-                              blurRadius: isSelected ? 14 : 8,
-                              spreadRadius: isSelected ? 2 : 0,
-                            )
-                          ],
-                        ),
-                        child: Center(
-                          child: Text(
-                            _categoryEmoji(place.category),
-                            style: TextStyle(
-                                fontSize: isSelected ? 18 : 14),
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ),
-            ],
-          ),
-
-          // ── Search bar / top bar ─────────────────────────────────
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(28),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.12),
-                        blurRadius: 16,
-                        offset: const Offset(0, 4),
-                      )
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.map_rounded,
-                          color: AppColors.primary, size: 20),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          'Explore Egypt',
-                          style: GoogleFonts.poppins(
-                            color: AppColors.textSecondary,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ),
-                      if (Navigator.canPop(context))
-                        GestureDetector(
-                          onTap: () => Navigator.pop(context),
-                          child: const Icon(Icons.close_rounded,
-                              color: AppColors.textSecondary, size: 20),
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-
-          // ── Category filter ──────────────────────────────────────
-          Positioned(
-            top: 80,
-            left: 0,
-            right: 0,
-            child: _buildCategoryFilter(),
-          ),
-
-          // ── Loading ──────────────────────────────────────────────
-          if (_loading)
-            const Center(
-                child: CircularProgressIndicator(color: AppColors.primary)),
-
-          // ── Selected place card ──────────────────────────────────
-          if (_selectedPlace != null)
-            Positioned(
-              bottom: 24,
-              left: 16,
-              right: 16,
-              child: _PlaceMapCard(
-                place: _selectedPlace!,
-                onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (_) =>
-                            OverviewScreen(place: _selectedPlace!))),
-                onClose: () => setState(() => _selectedPlace = null),
-              ),
-            ),
-
-          // ── Floating buttons ─────────────────────────────────────
-          Positioned(
-            right: 16,
-            bottom: _selectedPlace != null ? 200 : 80,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                FloatingActionButton.small(
-                  heroTag: 'myLocation',
-                  onPressed: _goToMyLocation,
-                  backgroundColor: Colors.white,
-                  child: const Icon(Icons.my_location,
-                      color: AppColors.primary),
-                ),
-                const SizedBox(height: 8),
-                FloatingActionButton.small(
-                  heroTag: 'egyptView',
-                  onPressed: () =>
-                      _mapController.move(_egyptCenter, _defaultZoom),
-                  backgroundColor: Colors.white,
-                  child: const Icon(Icons.public_rounded,
-                      color: AppColors.secondary),
-                ),
-              ],
-            ),
-          ),
-        ],
+  void _showSnack(String msg) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(msg, style: GoogleFonts.poppins(fontSize: 13)),
+        backgroundColor: Colors.black87,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        duration: const Duration(seconds: 2),
       ),
     );
   }
 
-  String _categoryEmoji(String cat) {
+  String _formatCount(int count) {
+    if (count >= 1000) {
+      final k = count / 1000;
+      return '${k.toStringAsFixed(k == k.truncate() ? 0 : 1)}k';
+    }
+    return count.toString();
+  }
+
+  String _categoryLabel(String cat) {
     switch (cat) {
-      case 'historical': return '🏛️';
-      case 'beach': return '🏖️';
-      case 'desert': return '🏜️';
-      case 'museum': return '🏺';
-      case 'religious': return '🕌';
-      case 'nature': return '🌿';
-      case 'market': return '🛍️';
-      case 'cruise':     return '🚢';
-      case 'restaurant': return '🍽️';
-      case 'hotel':      return '🏨';
-      default: return '📍';
+      case 'historical': return 'Historical Landmark';
+      case 'beach':      return 'Beach';
+      case 'desert':     return 'Desert';
+      case 'museum':     return 'Museum';
+      case 'religious':  return 'Religious Site';
+      case 'nature':     return 'Nature';
+      case 'market':     return 'Market & Shops';
+      case 'cruise':     return 'Nile Cruise';
+      case 'restaurant': return 'Dining';
+      case 'hotel':      return 'Hotel';
+      default:           return 'Attraction';
     }
   }
 
-  Widget _buildCategoryFilter() {
-    final cats = [
-      ('All', null, '🌍'),
-      ('Historical', 'historical', '🏛️'),
-      ('Beach', 'beach', '🏖️'),
-      ('Desert', 'desert', '🏜️'),
-      ('Museum', 'museum', '🏺'),
-      ('Religious', 'religious', '🕌'),
-      ('Nature', 'nature', '🌿'),
-      ('Market', 'market', '🛍️'),
-      ('Restaurants', 'restaurant', '🍽️'),
-      ('Hotels', 'hotel', '🏨'),
-    ];
+  Color _categoryColor(String cat) {
+    for (final c in _categories) { if (c.$2 == cat) return c.$4; }
+    return AppColors.primary;
+  }
 
-    return SizedBox(
-      height: 44,
-      child: ListView.builder(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        scrollDirection: Axis.horizontal,
-        itemCount: cats.length,
-        itemBuilder: (_, i) {
-          final (label, id, emoji) = cats[i];
-          final isSelected = _selectedCategory == id;
-          return GestureDetector(
-            onTap: () {
-              setState(() => _selectedCategory = id);
-              _loadPlaces();
-            },
-            child: Container(
-              margin: const EdgeInsets.only(right: 8),
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: isSelected ? AppColors.secondary : Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                      color: Colors.black.withOpacity(0.1), blurRadius: 8)
-                ],
+  // shared glass decoration for top bar + bottom card
+  BoxDecoration _glassDeco({BorderRadius? radius, Border? border}) => BoxDecoration(
+    color: Colors.black.withOpacity(0.52),
+    borderRadius: radius,
+    border: border,
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    final topPad = MediaQuery.of(context).padding.top;
+
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: GestureDetector(
+        onTap: () { _searchFocus.unfocus(); setState(() => _searchActive = false); },
+        child: Stack(
+          children: [
+
+            // ── Map ──────────────────────────────────────────────────
+            FlutterMap(
+              mapController: _mapController,
+              options: MapOptions(
+                initialCenter: widget.focusPlace != null
+                    ? LatLng(widget.focusPlace!.location.latitude, widget.focusPlace!.location.longitude)
+                    : _cairoCenter,
+                initialZoom: widget.focusPlace != null ? 13.0 : 10.5,
+                onTap: (_, __) {
+                  if (_selectedPlace != null) { _deselectPlace(); return; }
+                  _searchFocus.unfocus();
+                  setState(() => _searchActive = false);
+                },
               ),
-              child: Text(
-                '$emoji $label',
-                style: GoogleFonts.poppins(
-                  fontSize: 12,
-                  color: isSelected
-                      ? Colors.white
-                      : AppColors.textSecondary,
-                  fontWeight: isSelected
-                      ? FontWeight.w600
-                      : FontWeight.normal,
+              children: [
+                TileLayer(
+                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                  userAgentPackageName: 'com.discover.egypt',
+                  maxZoom: 19,
+                ),
+                if (_userLocation != null)
+                  MarkerLayer(markers: [
+                    Marker(
+                      point: _userLocation!, width: 24, height: 24,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF4A90D9), shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 3),
+                          boxShadow: [BoxShadow(color: const Color(0xFF4A90D9).withOpacity(0.5), blurRadius: 10, spreadRadius: 2)],
+                        ),
+                      ),
+                    ),
+                  ]),
+                MarkerLayer(
+                  markers: _filteredPlaces.map((place) {
+                    final isSel  = _selectedPlace?.id == place.id;
+                    final color  = _categoryColor(place.category);
+                    return Marker(
+                      point: LatLng(place.location.latitude, place.location.longitude),
+                      width: 130, height: isSel ? 70 : 38,
+                      alignment: Alignment.bottomCenter,
+                      child: GestureDetector(
+                        onTap: () => _selectPlace(place),
+                        child: _MapPin(label: place.getName('en'), isSelected: isSel, color: color),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ],
+            ),
+
+            // ── Top bar (slides up when place selected) ───────────────
+            Positioned(
+              top: topPad + 12, left: 14, right: 14,
+              child: SlideTransition(
+                position: _barSlide,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+
+                    // ── Search bar ──────────────────────────────────
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(18),
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+                        child: Container(
+                          decoration: _glassDeco(
+                            radius: BorderRadius.circular(18),
+                            border: Border.all(color: Colors.white.withOpacity(0.14), width: 1),
+                          ),
+                          child: Row(
+                            children: [
+                              const SizedBox(width: 14),
+                              Icon(Icons.search_rounded, color: Colors.white.withOpacity(0.7), size: 20),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: TextField(
+                                  controller: _searchCtrl,
+                                  focusNode:  _searchFocus,
+                                  onTap: () => setState(() => _searchActive = true),
+                                  style: GoogleFonts.poppins(fontSize: 13, color: Colors.white, fontWeight: FontWeight.w500),
+                                  cursorColor: Colors.white,
+                                  decoration: InputDecoration(
+                                    hintText: 'Search places...',
+                                    hintStyle: GoogleFonts.poppins(fontSize: 13, color: Colors.white38, fontWeight: FontWeight.w400),
+                                    border: InputBorder.none, isDense: true,
+                                    contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                                  ),
+                                ),
+                              ),
+                              if (_searchCtrl.text.isNotEmpty)
+                                GestureDetector(
+                                  onTap: () { _searchCtrl.clear(); setState(() => _filteredPlaces = List.from(_allPlaces)); },
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(right: 12),
+                                    child: Icon(Icons.close_rounded, color: Colors.white54, size: 18),
+                                  ),
+                                )
+                              else
+                                const SizedBox(width: 14),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    // ── Search results dropdown ──────────────────────
+                    if (_searchActive && _searchCtrl.text.isNotEmpty && _filteredPlaces.isNotEmpty) ...[
+                      const SizedBox(height: 6),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+                          child: Container(
+                            constraints: const BoxConstraints(maxHeight: 220),
+                            decoration: _glassDeco(
+                              radius: BorderRadius.circular(16),
+                              border: Border.all(color: Colors.white.withOpacity(0.12), width: 1),
+                            ),
+                            child: ListView.separated(
+                              shrinkWrap: true, padding: const EdgeInsets.symmetric(vertical: 6),
+                              itemCount: _filteredPlaces.length.clamp(0, 6),
+                              separatorBuilder: (_, __) => Divider(color: Colors.white12, height: 1),
+                              itemBuilder: (_, i) {
+                                final p = _filteredPlaces[i];
+                                return ListTile(
+                                  dense: true,
+                                  leading: Container(
+                                    width: 34, height: 34,
+                                    decoration: BoxDecoration(
+                                      color: _categoryColor(p.category).withOpacity(0.25),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Icon(Icons.place_rounded, color: _categoryColor(p.category), size: 18),
+                                  ),
+                                  title: Text(p.getName('en'),
+                                    style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white)),
+                                  subtitle: Text(p.governorate,
+                                    style: GoogleFonts.poppins(fontSize: 11, color: Colors.white54)),
+                                  onTap: () { _searchCtrl.clear(); _animateToPlace(p); },
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+
+                    const SizedBox(height: 10),
+
+                    // ── Category chips ──────────────────────────────
+                    SizedBox(
+                      height: 38,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: _categories.length,
+                        itemBuilder: (_, i) {
+                          final (label, id, icon, color) = _categories[i];
+                          final isSel = _selectedCategory == id;
+                          return GestureDetector(
+                            onTap: () { setState(() => _selectedCategory = id); _loadPlaces(); },
+                            child: Container(
+                              margin: const EdgeInsets.only(right: 8),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(20),
+                                child: BackdropFilter(
+                                  filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                                  child: AnimatedContainer(
+                                    duration: const Duration(milliseconds: 200),
+                                    padding: const EdgeInsets.symmetric(horizontal: 13),
+                                    decoration: BoxDecoration(
+                                      color: isSel ? color.withOpacity(0.80) : Colors.black.withOpacity(0.48),
+                                      borderRadius: BorderRadius.circular(20),
+                                      border: Border.all(
+                                        color: isSel ? color.withOpacity(0.5) : Colors.white.withOpacity(0.15),
+                                        width: 1,
+                                      ),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(icon, size: 13, color: Colors.white),
+                                        const SizedBox(width: 5),
+                                        Text(label.toUpperCase(),
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 10.5, fontWeight: FontWeight.w700,
+                                            color: Colors.white, letterSpacing: 0.4,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
-          );
-        },
+
+            // ── Loading pill ──────────────────────────────────────────
+            if (_loading)
+              Positioned(
+                top: topPad + 160, left: 0, right: 0,
+                child: Center(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(30),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 11),
+                        decoration: _glassDeco(
+                          radius: BorderRadius.circular(30),
+                          border: Border.all(color: Colors.white.withOpacity(0.15)),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            SizedBox(width: 14, height: 14,
+                              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white.withOpacity(0.85))),
+                            const SizedBox(width: 10),
+                            Text('Loading places...', style: GoogleFonts.poppins(fontSize: 12, color: Colors.white)),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+            // ── My-location FAB ───────────────────────────────────────
+            AnimatedPositioned(
+              duration: const Duration(milliseconds: 340),
+              curve: Curves.easeOutCubic,
+              right: 14,
+              bottom: _selectedPlace != null ? 290 : 90,
+              child: GestureDetector(
+                onTap: _goToMyLocation,
+                child: ClipOval(
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                    child: Container(
+                      width: 46, height: 46,
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.50),
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white.withOpacity(0.18), width: 1),
+                      ),
+                      child: const Icon(Icons.my_location_rounded, color: Colors.white, size: 21),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+            // ── Place bottom card ─────────────────────────────────────
+            if (_selectedPlace != null)
+              Positioned(
+                bottom: 0, left: 0, right: 0,
+                child: SlideTransition(
+                  position: _cardSlide,
+                  child: _PlaceGlassCard(
+                    place:         _selectedPlace!,
+                    isFav:         _isFav,
+                    formatCount:   _formatCount,
+                    categoryLabel: _categoryLabel,
+                    categoryColor: _categoryColor,
+                    glassDeco:     _glassDeco,
+                    onViewDetails: () => Navigator.push(context,
+                        MaterialPageRoute(builder: (_) => OverviewScreen(place: _selectedPlace!))),
+                    onClose:       _deselectPlace,
+                    onFav:         _toggleFav,
+                    onShare:       _sharePlace,
+                  ),
+                ),
+              ),
+
+          ],
+        ),
       ),
     );
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-class _PlaceMapCard extends StatelessWidget {
-  final Place place;
-  final VoidCallback onTap;
-  final VoidCallback onClose;
-
-  const _PlaceMapCard(
-      {required this.place, required this.onTap, required this.onClose});
+// ─── Map pin ──────────────────────────────────────────────────────────────────
+class _MapPin extends StatelessWidget {
+  final String label;
+  final bool   isSelected;
+  final Color  color;
+  const _MapPin({required this.label, required this.isSelected, required this.color});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(22),
-        boxShadow: [
-          BoxShadow(
-              color: Colors.black.withOpacity(0.18),
-              blurRadius: 24,
-              offset: const Offset(0, 6))
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: place.displayImage.isNotEmpty
-                    ? Image.network(
-                        place.displayImage,
-                        width: 72,
-                        height: 72,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => Container(
-                          width: 72,
-                          height: 72,
-                          color: AppColors.secondary,
-                          child: const Icon(Icons.image,
-                              color: Colors.white30),
-                        ),
-                      )
-                    : Container(
-                        width: 72,
-                        height: 72,
-                        color: AppColors.secondary),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (isSelected) ...[
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.90),
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: [BoxShadow(color: color.withOpacity(0.3), blurRadius: 10, offset: const Offset(0, 3))],
+                ),
+                child: Text(label,
+                  style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
+                  maxLines: 1, overflow: TextOverflow.ellipsis,
+                ),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
+            ),
+          ),
+          const SizedBox(height: 3),
+        ],
+        Container(
+          width: isSelected ? 38 : 28, height: isSelected ? 38 : 28,
+          decoration: BoxDecoration(
+            color: isSelected ? color : Colors.white,
+            shape: BoxShape.circle,
+            border: Border.all(color: isSelected ? Colors.white : color, width: 2.5),
+            boxShadow: [BoxShadow(
+              color: color.withOpacity(isSelected ? 0.55 : 0.3),
+              blurRadius: isSelected ? 16 : 8,
+              spreadRadius: isSelected ? 2 : 0,
+            )],
+          ),
+          child: Center(
+            child: Icon(Icons.place_rounded,
+              size: isSelected ? 20 : 14,
+              color: isSelected ? Colors.white : color),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ─── Bottom glass card ────────────────────────────────────────────────────────
+class _PlaceGlassCard extends StatelessWidget {
+  final Place      place;
+  final bool       isFav;
+  final String Function(int)    formatCount;
+  final String Function(String) categoryLabel;
+  final Color  Function(String) categoryColor;
+  final BoxDecoration Function({BorderRadius? radius, Border? border}) glassDeco;
+  final VoidCallback onViewDetails;
+  final VoidCallback onClose;
+  final VoidCallback onFav;
+  final VoidCallback onShare;
+
+  const _PlaceGlassCard({
+    required this.place,       required this.isFav,
+    required this.formatCount, required this.categoryLabel,
+    required this.categoryColor, required this.glassDeco,
+    required this.onViewDetails, required this.onClose,
+    required this.onFav,       required this.onShare,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final bottomPad = MediaQuery.of(context).padding.bottom;
+    final catColor  = categoryColor(place.category);
+
+    return ClipRRect(
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(26)),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+        child: Container(
+          decoration: glassDeco(
+            radius: const BorderRadius.vertical(top: Radius.circular(26)),
+            border: Border(top: BorderSide(color: Colors.white.withOpacity(0.15), width: 1)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // drag handle
+              const SizedBox(height: 10),
+              Container(width: 38, height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.30),
+                  borderRadius: BorderRadius.circular(2),
+                )),
+              const SizedBox(height: 16),
+
+              Padding(
+                padding: EdgeInsets.fromLTRB(18, 0, 18, bottomPad + 16),
+                child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      place.getName('en'),
-                      style: GoogleFonts.poppins(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14.5,
-                        color: AppColors.textPrimary,
+
+                    // ── Left info ─────────────────────────────────
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(place.getName('en'),
+                            style: GoogleFonts.poppins(
+                              fontSize: 20, fontWeight: FontWeight.w700,
+                              color: Colors.white, height: 1.2,
+                            ),
+                            maxLines: 2, overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 6),
+
+                          Row(children: [
+                            const Icon(Icons.star_rounded, color: AppColors.starColor, size: 15),
+                            const SizedBox(width: 3),
+                            Text(place.avgRating.toStringAsFixed(1),
+                              style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w700, color: Colors.white)),
+                            const SizedBox(width: 4),
+                            Text('(${formatCount(place.reviewCount)} reviews)',
+                              style: GoogleFonts.poppins(fontSize: 11.5, color: Colors.white60)),
+                            const SizedBox(width: 6),
+                            Container(width: 3, height: 3,
+                              decoration: const BoxDecoration(color: Colors.white38, shape: BoxShape.circle)),
+                            const SizedBox(width: 6),
+                            Expanded(child: Text(categoryLabel(place.category),
+                              style: GoogleFonts.poppins(fontSize: 11.5, color: Colors.white60),
+                              overflow: TextOverflow.ellipsis)),
+                          ]),
+                          const SizedBox(height: 14),
+
+                          // Get Directions button
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton.icon(
+                              onPressed: onViewDetails,
+                              icon: const Icon(Icons.near_me_rounded, color: Colors.white, size: 16),
+                              label: Text('Get Directions',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.primary,
+                                padding: const EdgeInsets.symmetric(vertical: 13),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                                elevation: 0,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+
+                          // Save + Share chips
+                          Row(children: [
+                            _GlassChip(
+                              icon: isFav ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
+                              label: isFav ? 'Saved' : 'Save',
+                              active: isFav,
+                              activeColor: AppColors.primary,
+                              onTap: onFav,
+                            ),
+                            const SizedBox(width: 10),
+                            _GlassChip(
+                              icon: Icons.share_rounded,
+                              label: 'Share',
+                              onTap: onShare,
+                            ),
+                          ]),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 4),
-                    Row(
+
+                    const SizedBox(width: 14),
+
+                    // ── Right: image + close ──────────────────────
+                    Column(
                       children: [
-                        const Icon(Icons.location_on_rounded,
-                            color: AppColors.primary, size: 13),
-                        const SizedBox(width: 3),
-                        Expanded(
-                          child: Text(
-                            place.governorate,
-                            style: GoogleFonts.poppins(
-                              fontSize: 11.5,
-                              color: AppColors.textSecondary,
+                        Stack(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(14),
+                              child: place.displayImage.isNotEmpty
+                                  ? Image.network(place.displayImage,
+                                      width: 100, height: 100, fit: BoxFit.cover,
+                                      errorBuilder: (_, __, ___) => _imgFallback(catColor))
+                                  : _imgFallback(catColor),
                             ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
+                            // close ×
+                            Positioned(
+                              top: 5, right: 5,
+                              child: GestureDetector(
+                                onTap: onClose,
+                                child: ClipOval(
+                                  child: BackdropFilter(
+                                    filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                                    child: Container(
+                                      width: 24, height: 24,
+                                      decoration: BoxDecoration(
+                                        color: Colors.black.withOpacity(0.55),
+                                        shape: BoxShape.circle,
+                                        border: Border.all(color: Colors.white.withOpacity(0.3)),
+                                      ),
+                                      child: const Icon(Icons.close_rounded, color: Colors.white, size: 13),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 2),
-                    Row(
-                      children: [
-                        const Icon(Icons.star_rounded,
-                            color: AppColors.starColor, size: 13),
-                        const SizedBox(width: 3),
-                        Text(
-                          place.avgRating.toStringAsFixed(1),
-                          style: GoogleFonts.poppins(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 12.5,
-                            color: AppColors.textPrimary,
+                        const SizedBox(height: 8),
+                        // category badge
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: BackdropFilter(
+                            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                            child: Container(
+                              width: 100, height: 30,
+                              decoration: BoxDecoration(
+                                color: catColor.withOpacity(0.25),
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(color: catColor.withOpacity(0.45), width: 1),
+                              ),
+                              child: Center(
+                                child: Text(categoryLabel(place.category),
+                                  style: GoogleFonts.poppins(fontSize: 10, fontWeight: FontWeight.w600, color: Colors.white),
+                                  overflow: TextOverflow.ellipsis),
+                              ),
+                            ),
                           ),
                         ),
                       ],
@@ -482,41 +765,65 @@ class _PlaceMapCard extends StatelessWidget {
                   ],
                 ),
               ),
-              GestureDetector(
-                onTap: onClose,
-                child: const Icon(Icons.close_rounded,
-                    color: AppColors.textLight, size: 20),
-              ),
             ],
           ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: ElevatedButton.icon(
-                  onPressed: onTap,
-                  icon: const Icon(Icons.explore_rounded,
-                      color: Colors.white, size: 16),
-                  label: Text(
-                    'View Details',
-                    style: GoogleFonts.poppins(
-                      color: Colors.white,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    padding: const EdgeInsets.symmetric(vertical: 11),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14)),
-                    elevation: 0,
-                  ),
-                ),
+        ),
+      ),
+    );
+  }
+
+  Widget _imgFallback(Color c) => Container(
+    width: 100, height: 100,
+    decoration: BoxDecoration(color: c.withOpacity(0.25), borderRadius: BorderRadius.circular(14)),
+    child: Icon(Icons.photo_rounded, color: c, size: 36),
+  );
+}
+
+// ─── Glass chip ───────────────────────────────────────────────────────────────
+class _GlassChip extends StatelessWidget {
+  final IconData  icon;
+  final String    label;
+  final bool      active;
+  final Color?    activeColor;
+  final VoidCallback onTap;
+
+  const _GlassChip({
+    required this.icon, required this.label, required this.onTap,
+    this.active = false, this.activeColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final col = active && activeColor != null ? activeColor! : Colors.white70;
+    return GestureDetector(
+      onTap: onTap,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(10),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            decoration: BoxDecoration(
+              color: active
+                  ? activeColor!.withOpacity(0.18)
+                  : Colors.white.withOpacity(0.10),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: active ? activeColor!.withOpacity(0.45) : Colors.white.withOpacity(0.18),
+                width: 1,
               ),
-            ],
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(icon, size: 14, color: col),
+                const SizedBox(width: 5),
+                Text(label, style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w500, color: col)),
+              ],
+            ),
           ),
-        ],
+        ),
       ),
     );
   }

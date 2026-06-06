@@ -8,6 +8,7 @@ import 'l10n/app_localizations.dart';
 import 'constants/app_colors.dart';
 import 'providers/auth_provider.dart';
 import 'providers/locale_provider.dart';
+import 'providers/map_state_provider.dart';
 import 'screens/splash_screen.dart';
 import 'screens/onboarding_screen.dart';
 import 'screens/auth_screen.dart';
@@ -38,6 +39,7 @@ class DiscoverEgyptApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => LocaleProvider()),
+        ChangeNotifierProvider(create: (_) => MapStateProvider()),
       ],
       child: Consumer<LocaleProvider>(
         builder: (context, localeProvider, child) {
@@ -103,7 +105,6 @@ class _AppEntryPointState extends State<AppEntryPoint> {
   Future<void> _init() async {
     final authProvider = context.read<AuthProvider>();
     await authProvider.tryAutoLogin();
-    await Future.delayed(const Duration(milliseconds: 1500)); // splash
     setState(() {
       _initialized = true;
       // If already logged in, skip onboarding and go directly home
@@ -130,7 +131,7 @@ class _AppEntryPointState extends State<AppEntryPoint> {
     // Determine the current screen widget
     Widget screen;
     if (!_initialized) {
-      screen = const SplashScreen();
+      screen = const SizedBox.shrink(); // no splash — instant load
     } else if (!_onboardingDone) {
       screen = OnboardingScreen(
         key: const ValueKey('onboarding'),

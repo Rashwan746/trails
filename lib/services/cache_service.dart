@@ -82,4 +82,15 @@ class CacheService {
     final data = await get(key);
     return data != null;
   }
+
+  /// Estimate cache size in bytes (based on string lengths in SharedPreferences)
+  Future<int> getCacheSize() async {
+    final prefs = await SharedPreferences.getInstance();
+    int total = 0;
+    for (final k in prefs.getKeys().where((k) => k.startsWith(_prefix))) {
+      final v = prefs.getString(k);
+      if (v != null) total += v.length;
+    }
+    return total;
+  }
 }

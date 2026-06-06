@@ -370,15 +370,6 @@ class _HomeScreenState extends State<HomeScreen>
           ],
         ),
         ), // ClipRRect
-        // Collapsed title
-        title: Text(
-          'Discover Egypt',
-          style: GoogleFonts.poppins(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
         centerTitle: false,
       ),
     );

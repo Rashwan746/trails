@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'api_service.dart';
 import '../models/user_model.dart';
 
@@ -76,4 +77,35 @@ class AuthService {
   }
 
   bool get isLoggedIn => _api.isAuthenticated;
+
+  // ── Google Sign-In ────────────────────────────────────────────────────────
+  // Replace YOUR_WEB_CLIENT_ID with your actual Web Client ID from:
+  // Google Cloud Console → APIs & Services → Credentials
+  static const _webClientId =
+      '1053808573195-iemgo9fdbqe1oe0dcqn64up3486fvf9t.apps.googleusercontent.com';
+
+  // Lazy — created only when needed (avoids MissingPluginException on load)
+  GoogleSignIn? _googleSignInInstance;
+  GoogleSignIn get _googleSignIn {
+    _googleSignInInstance ??= GoogleSignIn(
+      clientId: _webClientId,
+      scopes: ['email', 'profile'],
+    );
+    return _googleSignInInstance!;
+  }
+
+  Future<User> loginWithGoogle() async {
+    final googleUser = await _googleSignIn.signIn();
+    if (googleUser == null) throw Exception('Google Sign-In was cancelled.');
+    final googleAuth = await googleUser.authentication;
+    final idToken = googleAuth.idToken;
+    if (idToken == null) throw Exception('Failed to get Google ID token.');
+    final res = await _api.post('/auth/google', {'id_token': idToken});
+    await _saveSession(res);
+    return User.fromJson(res['user']);
+  }
+
+  Future<void> signOutGoogle() async {
+    try { await _googleSignInInstance?.signOut(); } catch (_) {}
+  }
 }

@@ -26,18 +26,18 @@ class _SearchScreenState extends State<SearchScreen> {
   int _total = 0;
   SearchFilters _filters = const SearchFilters();
 
-  final List<Map<String, String>> _categories = [
-    {'id': 'all', 'label': 'All', 'emoji': '🌍'},
-    {'id': 'historical', 'label': 'Historical', 'emoji': '🏛️'},
-    {'id': 'beach', 'label': 'Beach', 'emoji': '🏖️'},
-    {'id': 'desert', 'label': 'Desert', 'emoji': '🏜️'},
-    {'id': 'museum', 'label': 'Museum', 'emoji': '🏺'},
-    {'id': 'religious', 'label': 'Religious', 'emoji': '🕌'},
-    {'id': 'nature', 'label': 'Nature', 'emoji': '🌿'},
-    {'id': 'market', 'label': 'Market', 'emoji': '🛍️'},
-    {'id': 'cruise', 'label': 'Cruise', 'emoji': '🚢'},
-    {'id': 'restaurant', 'label': 'Restaurants', 'emoji': '🍽️'},
-    {'id': 'hotel', 'label': 'Hotels', 'emoji': '🏨'},
+  final List<Map<String, dynamic>> _categories = [
+    {'id': 'all',        'label': 'All',         'icon': Icons.public_rounded},
+    {'id': 'historical', 'label': 'Historical',  'icon': Icons.account_balance_rounded},
+    {'id': 'beach',      'label': 'Beach',        'icon': Icons.beach_access_rounded},
+    {'id': 'desert',     'label': 'Desert',       'icon': Icons.wb_sunny_rounded},
+    {'id': 'museum',     'label': 'Museum',       'icon': Icons.museum_rounded},
+    {'id': 'religious',  'label': 'Religious',    'icon': Icons.mosque_rounded},
+    {'id': 'nature',     'label': 'Nature',       'icon': Icons.forest_rounded},
+    {'id': 'market',     'label': 'Market',       'icon': Icons.storefront_rounded},
+    {'id': 'cruise',     'label': 'Cruise',       'icon': Icons.directions_boat_rounded},
+    {'id': 'restaurant', 'label': 'Dining',       'icon': Icons.restaurant_rounded},
+    {'id': 'hotel',      'label': 'Hotels',       'icon': Icons.bed_rounded},
   ];
 
   @override
@@ -154,40 +154,57 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Widget _buildCategoryChips() {
-    return SizedBox(
-      height: 44,
-      child: ListView.builder(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        scrollDirection: Axis.horizontal,
-        itemCount: _categories.length,
-        itemBuilder: (_, i) {
-          final cat = _categories[i];
-          final isSelected = (_selectedCategory ?? 'all') == cat['id'];
-          return GestureDetector(
-            onTap: () {
-              setState(() => _selectedCategory = cat['id']);
-              _search();
-            },
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              margin: const EdgeInsets.only(right: 8),
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              decoration: BoxDecoration(
-                color: isSelected ? AppColors.primary : Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 6)],
-              ),
-              child: Text(
-                '${cat['emoji']} ${cat['label']}',
-                style: GoogleFonts.poppins(
-                  fontSize: 12,
-                  color: isSelected ? Colors.white : AppColors.textSecondary,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+    return Container(
+      color: Colors.white,
+      padding: const EdgeInsets.fromLTRB(16, 6, 16, 10),
+      child: SizedBox(
+        height: 36,
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          itemCount: _categories.length,
+          itemBuilder: (_, i) {
+            final cat = _categories[i];
+            final isSelected = (_selectedCategory ?? 'all') == cat['id'];
+            return GestureDetector(
+              onTap: () {
+                setState(() => _selectedCategory = cat['id'] as String);
+                _search();
+              },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                margin: const EdgeInsets.only(right: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 14),
+                decoration: BoxDecoration(
+                  color: isSelected ? AppColors.primary : Colors.transparent,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: isSelected ? AppColors.primary : const Color(0xFFE5E7EB),
+                    width: 1.5,
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      cat['icon'] as IconData,
+                      size: 13,
+                      color: isSelected ? Colors.white : AppColors.textSecondary,
+                    ),
+                    const SizedBox(width: 5),
+                    Text(
+                      cat['label'] as String,
+                      style: GoogleFonts.poppins(
+                        fontSize: 13,
+                        color: isSelected ? Colors.white : AppColors.textSecondary,
+                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

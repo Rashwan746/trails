@@ -1,8 +1,10 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
 import '../l10n/app_localizations.dart';
+import '../providers/map_state_provider.dart';
 import '../utils/page_transitions.dart';
 import 'home_screen.dart';
 import 'map_screen.dart';
@@ -53,6 +55,7 @@ class _MainShellState extends State<MainShell> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
+    final mapPlaceSelected = context.watch<MapStateProvider>().placeSelected;
 
     return Scaffold(
       extendBody: true,
@@ -70,110 +73,118 @@ class _MainShellState extends State<MainShell> with TickerProviderStateMixin {
           children: _screens,
         ),
       ),
-      bottomNavigationBar: _buildNavBar(l10n, bottomPadding),
+      bottomNavigationBar: AnimatedSlide(
+        duration: const Duration(milliseconds: 320),
+        curve: Curves.easeInOutCubic,
+        offset: mapPlaceSelected ? const Offset(0, 1.5) : Offset.zero,
+        child: AnimatedOpacity(
+          duration: const Duration(milliseconds: 280),
+          opacity: mapPlaceSelected ? 0.0 : 1.0,
+          child: _buildNavBar(l10n, bottomPadding),
+        ),
+      ),
     );
   }
 
   Widget _buildNavBar(AppLocalizations l10n, double bottomPadding) {
     final items = [
-      _NavItem(icon: Icons.explore_rounded, label: 'Discover'),
+      _NavItem(icon: Icons.explore_rounded,  label: 'Discover'),
       _NavItem(icon: Icons.favorite_rounded, label: l10n.favorites),
-      _NavItem(icon: Icons.map_rounded, label: l10n.map),
-      _NavItem(icon: Icons.person_rounded, label: l10n.profile),
+      _NavItem(icon: Icons.map_rounded,      label: l10n.map),
+      _NavItem(icon: Icons.person_rounded,   label: l10n.profile),
     ];
 
-    // Split items: 2 left, 2 right (AI button goes in centre)
-    final leftItems = items.sublist(0, 2);
+    final leftItems  = items.sublist(0, 2);
     final rightItems = items.sublist(2, 4);
 
     return Container(
       color: Colors.transparent,
-      padding: EdgeInsets.fromLTRB(
-        16,
-        0,
-        16,
-        bottomPadding > 0 ? bottomPadding : 10,
-      ),
+      padding: EdgeInsets.fromLTRB(16, 0, 16,
+          bottomPadding > 0 ? bottomPadding : 12),
       child: Stack(
         clipBehavior: Clip.none,
         alignment: Alignment.topCenter,
         children: [
-          // ── Nav bar pill ───────────────────────────────────────────────
+          // ── Dark glass pill bar ────────────────────────────────────────
           ClipRRect(
-            borderRadius: BorderRadius.circular(32),
+            borderRadius: BorderRadius.circular(36),
             child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+              filter: ImageFilter.blur(sigmaX: 28, sigmaY: 28),
               child: Container(
-                height: 62,
+                height: 68,
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.6),
-                  borderRadius: BorderRadius.circular(32),
+                  color: const Color(0xFF1C1C1E).withOpacity(0.78),
+                  borderRadius: BorderRadius.circular(36),
                   border: Border.all(
-                    color: Colors.white.withOpacity(0.1),
+                    color: Colors.white.withOpacity(0.08),
                     width: 1,
                   ),
                 ),
                 child: Row(
                   children: [
                     // Left 2 items
-                    ...leftItems.asMap().entries.map((e) {
-                      final i = e.key;
-                      return Expanded(child: _navItem(items[i], i));
-                    }),
+                    ...leftItems.asMap().entries.map((e) =>
+                        Expanded(child: _navItem(items[e.key], e.key))),
 
-                    // Centre gap for AI button
-                    const SizedBox(width: 62),
+                    // Centre gap
+                    const SizedBox(width: 68),
 
                     // Right 2 items
-                    ...rightItems.asMap().entries.map((e) {
-                      final i = e.key + 2;
-                      return Expanded(child: _navItem(items[i], i));
-                    }),
+                    ...rightItems.asMap().entries.map((e) =>
+                        Expanded(child: _navItem(items[e.key + 2], e.key + 2))),
                   ],
                 ),
               ),
             ),
           ),
 
-          // ── AI floating button (centered, above bar) ────────────────────
+          // ── AI glow behind the button ──────────────────────────────────
           Positioned(
-            top: -22,
-            child: AnimatedBuilder(
-              animation: _pulseAnim,
-              builder: (_, child) => Transform.scale(
-                scale: _pulseAnim.value,
-                child: child,
+            top: -8,
+            child: Container(
+              width: 80, height: 80,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withOpacity(0.22),
+                    blurRadius: 28,
+                    spreadRadius: 4,
+                  ),
+                ],
               ),
-              child: GestureDetector(
-                onTap: () => Navigator.push(
-                  context,
-                  slideUpRoute(const ChatScreen()),
-                ),
+            ),
+          ),
+
+          // ── AI floating button ─────────────────────────────────────────
+          Positioned(
+            top: -26,
+            child: GestureDetector(
+              onTap: () => Navigator.push(
+                context,
+                slideUpRoute(const ChatScreen()),
+              ),
+              child: AnimatedBuilder(
+                animation: _pulseAnim,
+                builder: (_, child) =>
+                    Transform.scale(scale: _pulseAnim.value, child: child),
                 child: Container(
-                  width: 56,
-                  height: 56,
+                  width: 62,
+                  height: 62,
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF7C6FFF), Color(0xFF3B82F6)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
+                    color: AppColors.primary,
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF6C63FF).withOpacity(0.6),
-                        blurRadius: 20,
+                        color: AppColors.primary.withOpacity(0.45),
+                        blurRadius: 18,
                         spreadRadius: 0,
-                        offset: const Offset(0, 4),
+                        offset: const Offset(0, 6),
                       ),
                     ],
-                    border: Border.all(
-                      color: Colors.white.withOpacity(0.3),
-                      width: 1.5,
-                    ),
                   ),
                   child: const Center(
-                    child: Text('✨', style: TextStyle(fontSize: 24)),
+                    child: _AiIcon(),
                   ),
                 ),
               ),
@@ -193,13 +204,12 @@ class _MainShellState extends State<MainShell> with TickerProviderStateMixin {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           AnimatedContainer(
-            duration: const Duration(milliseconds: 220),
+            duration: const Duration(milliseconds: 200),
             curve: Curves.easeOut,
-            width: selected ? 42 : 32,
-            height: selected ? 30 : 22,
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
               color: selected
-                  ? Colors.white.withOpacity(0.15)
+                  ? Colors.white.withOpacity(0.12)
                   : Colors.transparent,
               borderRadius: BorderRadius.circular(12),
             ),
@@ -207,25 +217,49 @@ class _MainShellState extends State<MainShell> with TickerProviderStateMixin {
               item.icon,
               color: selected
                   ? Colors.white
-                  : Colors.white.withOpacity(0.45),
-              size: selected ? 19 : 17,
+                  : Colors.white.withOpacity(0.40),
+              size: 22,
             ),
           ),
           const SizedBox(height: 3),
           AnimatedDefaultTextStyle(
-            duration: const Duration(milliseconds: 220),
+            duration: const Duration(milliseconds: 200),
             style: GoogleFonts.poppins(
-              fontSize: 9,
-              fontWeight:
-                  selected ? FontWeight.w600 : FontWeight.w400,
+              fontSize: 10,
+              fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
               color: selected
                   ? Colors.white
-                  : Colors.white.withOpacity(0.45),
+                  : Colors.white.withOpacity(0.40),
             ),
             child: Text(item.label),
           ),
         ],
       ),
+    );
+  }
+}
+
+// Custom AI icon widget (two-letter "AI" styled)
+class _AiIcon extends StatelessWidget {
+  const _AiIcon();
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        // Outer sparkle ring
+        Icon(Icons.auto_awesome_rounded,
+            color: Colors.white.withOpacity(0.25), size: 42),
+        // AI text
+        Text('AI',
+            style: GoogleFonts.poppins(
+              color: Colors.white,
+              fontSize: 17,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 0.5,
+            )),
+      ],
     );
   }
 }

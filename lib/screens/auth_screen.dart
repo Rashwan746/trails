@@ -31,6 +31,7 @@ class _AuthScreenState extends State<AuthScreen>
   late TabController _tabController;
 
   bool _loading = false;
+  bool _otpVerified = false; // guard: prevent double-submit after success
   bool _obscureLogin = true;
   bool _obscureReg = true;
 
@@ -126,6 +127,9 @@ class _AuthScreenState extends State<AuthScreen>
       await context
           .read<AuthProvider>()
           .login(identifier, _loginPassword.text);
+      // Login succeeded — AuthProvider.notifyListeners already triggered navigation
+      // No further action needed; widget will be replaced by MainShell
+      return;
     } catch (e) {
       // If account not verified (403), redirect to OTP verification
       if (e is ApiException && e.statusCode == 403) {
@@ -144,7 +148,7 @@ class _AuthScreenState extends State<AuthScreen>
         if (mounted) {
           setState(() {
             _loading = false;
-            _currentScreen = _AuthScreen.otp;
+            _currentScreen = _AuthScreen.otp; _otpVerified = false;
           });
           // Auto-verify after a short delay so user sees the filled boxes
           if (_pendingOtp != null && _pendingOtp!.length == 4) {
@@ -263,7 +267,7 @@ class _AuthScreenState extends State<AuthScreen>
   }
 
   Future<void> _verifyOtp() async {
-    if (_loading) return; // prevent double-submit
+    if (_loading || _otpVerified) return; // prevent double-submit
     final otp = _otpValue;
     if (otp.length < 4 || _pendingUserId == null) {
       _showSnack('Please enter the complete 4-digit code', error: true);
@@ -273,7 +277,6 @@ class _AuthScreenState extends State<AuthScreen>
     try {
       if (_isResetFlow) {
         // For reset flow: save OTP and move to new-password step
-        // (actual OTP validation happens in resetPassword API call)
         _pendingOtp = otp;
         if (mounted) {
           setState(() {
@@ -283,15 +286,32 @@ class _AuthScreenState extends State<AuthScreen>
         }
         return;
       }
-      // Register flow: verify OTP then navigate directly to home
-      await context
-          .read<AuthProvider>()
-          .verifyOtp(_pendingUserId!, otp);
+      // Register / login flow: verify OTP
+      await context.read<AuthProvider>().verifyOtp(_pendingUserId!, otp);
+      // Success — mark as verified so no further attempts are possible
+      _otpVerified = true;
       // verifyOtp calls notifyListeners → AppEntryPoint rebuilds → MainShell
+      // No further UI updates needed — the widget will be replaced
     } catch (e) {
-      _showSnack(e.toString(), error: true);
+      final msg = e.toString();
+      // If account is already verified, redirect to login instead of looping
+      if (msg.toLowerCase().contains('already verified')) {
+        _showSnack('Account already verified. Please log in.', error: false);
+        if (mounted) {
+          setState(() {
+            _loading = false;
+            _currentScreen = _AuthScreen.welcome;
+          });
+        }
+        return;
+      }
+      if (msg.toLowerCase().contains('invalid') || msg.toLowerCase().contains('expired')) {
+        _showSnack('Incorrect code. Please check your email and try again.', error: true);
+      } else {
+        _showSnack(msg, error: true);
+      }
     } finally {
-      if (mounted) setState(() => _loading = false);
+      if (mounted && !_otpVerified) setState(() => _loading = false);
     }
   }
 
@@ -472,7 +492,7 @@ class _AuthScreenState extends State<AuthScreen>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Discover Egypt',
+                        'Trails',
                         style: GoogleFonts.poppins(
                           color: Colors.white,
                           fontSize: 30,
@@ -567,13 +587,9 @@ class _AuthScreenState extends State<AuthScreen>
                         padding: const EdgeInsets.fromLTRB(24, 12, 24, 0),
                         child: Row(
                           children: [
-                            Expanded(
-                                child:
-                                    _socialButton('G', 'Google')),
+                            Expanded(child: _googleButton()),
                             const SizedBox(width: 12),
-                            Expanded(
-                                child:
-                                    _socialButton('🍎', 'Apple')),
+                            Expanded(child: _appleButton()),
                           ],
                         ),
                       ),
@@ -1681,10 +1697,25 @@ class _AuthScreenState extends State<AuthScreen>
     );
   }
 
-  Widget _socialButton(String icon, String label) {
-    final isGoogle = icon == 'G';
+  // ── Google Sign-In ────────────────────────────────────────────────────────
+  Future<void> _loginWithGoogle() async {
+    setState(() => _loading = true);
+    try {
+      await context.read<AuthProvider>().loginWithGoogle();
+      // Success: AuthProvider notifies → MainShell replaces this screen
+    } catch (e) {
+      final msg = e.toString().replaceAll('Exception:', '').trim();
+      if (msg.isNotEmpty && msg != 'Google Sign-In was cancelled.') {
+        _showSnack(msg, error: true);
+      }
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  Widget _googleButton() {
     return OutlinedButton(
-      onPressed: () {},
+      onPressed: _loading ? null : _loginWithGoogle,
       style: OutlinedButton.styleFrom(
         minimumSize: const Size(double.infinity, 48),
         side: const BorderSide(color: Color(0xFFE5E7EB), width: 1.5),
@@ -1694,25 +1725,87 @@ class _AuthScreenState extends State<AuthScreen>
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(
-            icon,
-            style: TextStyle(
-              fontSize: isGoogle ? 16 : 18,
-              fontWeight: FontWeight.bold,
-              color: isGoogle ? const Color(0xFF4285F4) : Colors.black,
-            ),
-          ),
+          SizedBox(width: 22, height: 22, child: CustomPaint(painter: _GoogleLogoPainter())),
           const SizedBox(width: 8),
-          Text(
-            label,
-            style: GoogleFonts.poppins(
-              color: AppColors.textPrimary,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
+          Text('Google', style: GoogleFonts.poppins(
+              color: AppColors.textPrimary, fontSize: 14, fontWeight: FontWeight.w500)),
         ],
       ),
     );
   }
+
+  Widget _appleButton() {
+    return OutlinedButton(
+      onPressed: () {
+        _showSnack('Apple Sign-In coming soon!');
+      },
+      style: OutlinedButton.styleFrom(
+        minimumSize: const Size(double.infinity, 48),
+        side: const BorderSide(color: Color(0xFFE5E7EB), width: 1.5),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        backgroundColor: Colors.white,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 22, height: 22,
+            decoration: const BoxDecoration(color: Colors.black, shape: BoxShape.circle),
+            child: const Icon(Icons.apple, color: Colors.white, size: 16),
+          ),
+          const SizedBox(width: 8),
+          Text('Apple', style: GoogleFonts.poppins(
+              color: AppColors.textPrimary, fontSize: 14, fontWeight: FontWeight.w500)),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Google G Logo (multicolor CustomPainter) ──────────────────────────────────
+class _GoogleLogoPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+    final r = size.width / 2;
+    final strokeW = size.width * 0.18;
+    final half = strokeW / 2;
+
+    final paint = Paint()..style = PaintingStyle.stroke..strokeWidth = strokeW..strokeCap = StrokeCap.butt;
+
+    // Blue arc (top-right → bottom-right)
+    paint.color = const Color(0xFF4285F4);
+    canvas.drawArc(Rect.fromCircle(center: Offset(cx, cy), radius: r - half),
+        -0.52, 2.09, false, paint);
+
+    // Red arc (top)
+    paint.color = const Color(0xFFEA4335);
+    canvas.drawArc(Rect.fromCircle(center: Offset(cx, cy), radius: r - half),
+        -2.62, 2.10, false, paint);
+
+    // Yellow arc (bottom-left)
+    paint.color = const Color(0xFFFBBC04);
+    canvas.drawArc(Rect.fromCircle(center: Offset(cx, cy), radius: r - half),
+        2.09, 0.785, false, paint);
+
+    // Green arc (bottom)
+    paint.color = const Color(0xFF34A853);
+    canvas.drawArc(Rect.fromCircle(center: Offset(cx, cy), radius: r - half),
+        2.88, 0.79, false, paint);
+
+    // White inner circle (cuts the middle)
+    canvas.drawCircle(Offset(cx, cy), r * 0.55,
+        Paint()..color = Colors.white..style = PaintingStyle.fill);
+
+    // Blue crossbar (horizontal bar of the G)
+    final barPaint = Paint()
+      ..color = const Color(0xFF4285F4)
+      ..style = PaintingStyle.fill;
+    canvas.drawRect(Rect.fromLTWH(cx - 0.05, cy - size.height * 0.11,
+        r - half * 0.4, size.height * 0.22), barPaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter old) => false;
 }

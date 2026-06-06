@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:geolocator/geolocator.dart';
 import '../constants/app_colors.dart';
 import '../models/place_model.dart';
 import '../models/review_model.dart';
@@ -32,6 +33,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
   bool _favLoading = false;
   List<Review> _topReviews = [];
   late Place _place;
+  String _distanceText = '...';
 
   @override
   void initState() {
@@ -39,7 +41,35 @@ class _OverviewScreenState extends State<OverviewScreen> {
     _place = widget.place;
     _isFav = _place.isFavorite;
     _loadTopReviews();
+    _loadDistance();
     _analytics.placeView(_place.id, _place.getName('en'));
+  }
+
+  Future<void> _loadDistance() async {
+    try {
+      LocationPermission perm = await Geolocator.checkPermission();
+      if (perm == LocationPermission.denied) {
+        perm = await Geolocator.requestPermission();
+      }
+      if (perm == LocationPermission.denied || perm == LocationPermission.deniedForever) {
+        if (mounted) setState(() => _distanceText = 'N/A');
+        return;
+      }
+      final pos = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.low,
+      );
+      final meters = Geolocator.distanceBetween(
+        pos.latitude, pos.longitude,
+        _place.location.latitude, _place.location.longitude,
+      );
+      final km = meters / 1000;
+      final text = km < 1
+          ? '${meters.round()} m'
+          : '${km.toStringAsFixed(1)} KM';
+      if (mounted) setState(() => _distanceText = text);
+    } catch (_) {
+      if (mounted) setState(() => _distanceText = 'N/A');
+    }
   }
 
   Future<void> _sharePlace() async {
@@ -248,7 +278,9 @@ class _OverviewScreenState extends State<OverviewScreen> {
               const SizedBox(width: 10),
               _greenPill(
                 Icons.near_me_outlined,
-                'Distance 2.8 KM',
+                _distanceText == 'N/A'
+                    ? 'Distance N/A'
+                    : 'Distance $_distanceText',
               ),
             ],
           ),
@@ -416,14 +448,74 @@ class _OverviewScreenState extends State<OverviewScreen> {
             ],
           ),
 
-          // Rating breakdown
-          _buildRatingBar(5, _place.ratingBreakdown.r5, _place.reviewCount),
-          _buildRatingBar(4, _place.ratingBreakdown.r4, _place.reviewCount),
-          _buildRatingBar(3, _place.ratingBreakdown.r3, _place.reviewCount),
-          _buildRatingBar(2, _place.ratingBreakdown.r2, _place.reviewCount),
-          _buildRatingBar(1, _place.ratingBreakdown.r1, _place.reviewCount),
-
-          const SizedBox(height: 16),
+          // Rating summary card
+          if (_place.reviewCount > 0) ...[
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)],
+              ),
+              child: Row(
+                children: [
+                  // Big rating number
+                  Column(
+                    children: [
+                      Text(
+                        _place.avgRating.toStringAsFixed(1),
+                        style: GoogleFonts.poppins(
+                          fontSize: 44,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
+                          height: 1,
+                        ),
+                      ),
+                      Row(
+                        children: List.generate(5, (i) => Icon(
+                          i < _place.avgRating.round()
+                              ? Icons.star_rounded
+                              : Icons.star_border_rounded,
+                          color: AppColors.starColor,
+                          size: 14,
+                        )),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '${_place.reviewCount} reviews',
+                        style: GoogleFonts.poppins(
+                          fontSize: 11,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(width: 16),
+                  // Breakdown bars
+                  Expanded(
+                    child: Column(
+                      children: [
+                        _buildRatingBar(5, _place.ratingBreakdown.r5, _place.reviewCount),
+                        _buildRatingBar(4, _place.ratingBreakdown.r4, _place.reviewCount),
+                        _buildRatingBar(3, _place.ratingBreakdown.r3, _place.reviewCount),
+                        _buildRatingBar(2, _place.ratingBreakdown.r2, _place.reviewCount),
+                        _buildRatingBar(1, _place.ratingBreakdown.r1, _place.reviewCount),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+          ] else ...[
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Text('No reviews yet. Be the first!',
+                    style: GoogleFonts.poppins(color: AppColors.textSecondary, fontSize: 13)),
+              ),
+            ),
+          ],
 
           // Top Reviews
           ..._topReviews.map((r) => _ReviewTile(r)),
@@ -435,15 +527,14 @@ class _OverviewScreenState extends State<OverviewScreen> {
 
   Widget _buildRatingBar(int stars, int count, int total) {
     final percent = total > 0 ? count / total : 0.0;
-    final pctText = '${(percent * 100).round()}%';
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2.5),
+      padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
         children: [
           Text('$stars', style: GoogleFonts.poppins(fontSize: 11, color: AppColors.textSecondary)),
-          const SizedBox(width: 3),
+          const SizedBox(width: 2),
           const Icon(Icons.star_rounded, size: 11, color: AppColors.starColor),
-          const SizedBox(width: 6),
+          const SizedBox(width: 5),
           Expanded(
             child: ClipRRect(
               borderRadius: BorderRadius.circular(4),
@@ -457,14 +548,14 @@ class _OverviewScreenState extends State<OverviewScreen> {
           ),
           const SizedBox(width: 6),
           SizedBox(
-            width: 32,
+            width: 20,
             child: Text(
-              pctText,
+              '$count',
               textAlign: TextAlign.right,
               style: GoogleFonts.poppins(
                   fontSize: 11,
-                  color: AppColors.textSecondary,
-                  fontWeight: FontWeight.w500),
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.w600),
             ),
           ),
         ],

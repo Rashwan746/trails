@@ -16,6 +16,7 @@ import 'search_screen.dart';
 import 'chat_screen.dart';
 import 'profile_screen.dart';
 import 'map_screen.dart';
+import 'notifications_screen.dart';
 import '../utils/page_transitions.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -269,19 +270,40 @@ class _HomeScreenState extends State<HomeScreen>
                             ],
                           ),
                         ),
-                        GestureDetector(
-                          onTap: () => Navigator.push(
-                              context, slideUpRoute(const ProfileScreen())),
-                          child: Container(
-                            width: 38,
-                            height: 38,
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
-                              shape: BoxShape.circle,
+                        Row(
+                          children: [
+                            // Notifications bell
+                            GestureDetector(
+                              onTap: () => Navigator.push(
+                                  context, slideRightRoute(const NotificationsScreen())),
+                              child: Container(
+                                width: 38,
+                                height: 38,
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.2),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(Icons.notifications_outlined,
+                                    color: Colors.white, size: 20),
+                              ),
                             ),
-                            child: const Icon(Icons.person_rounded,
-                                color: Colors.white, size: 22),
-                          ),
+                            const SizedBox(width: 8),
+                            // Profile
+                            GestureDetector(
+                              onTap: () => Navigator.push(
+                                  context, slideUpRoute(const ProfileScreen())),
+                              child: Container(
+                                width: 38,
+                                height: 38,
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.2),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(Icons.person_rounded,
+                                    color: Colors.white, size: 22),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),

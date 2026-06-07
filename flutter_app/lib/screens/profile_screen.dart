@@ -10,6 +10,8 @@ import '../services/profile_service.dart';
 import '../services/analytics_service.dart';
 import 'app_settings_screen.dart';
 import 'auth_screen.dart';
+import 'notifications_screen.dart';
+import 'trip_planner_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -421,11 +423,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
         backgroundColor: const Color(0xFFF8F8F8),
         elevation: 0,
         scrolledUnderElevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.chevron_left_rounded,
-              color: AppColors.primary, size: 30),
-          onPressed: () {},
-        ),
+        automaticallyImplyLeading: false,
+        leading: Navigator.canPop(context)
+            ? IconButton(
+                icon: const Icon(Icons.chevron_left_rounded,
+                    color: AppColors.primary, size: 30),
+                onPressed: () => Navigator.pop(context),
+              )
+            : null,
         title: Text('Profile',
             style: GoogleFonts.poppins(
                 color: AppColors.textPrimary,
@@ -552,10 +557,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
             // ── ACCOUNT SETTINGS ──────────────────────────────────────
             _sectionHeader('ACCOUNT SETTINGS'),
             _settingsCard([
-              _switchRow(
+              _row(
+                iconBg: const Color(0xFFE11D48),
+                icon: Icons.map_rounded,
+                label: 'Trip Planner',
+                value: 'Plan your journey',
+                onTap: () => Navigator.push(context,
+                    MaterialPageRoute(
+                        builder: (_) => const TripPlannerScreen())),
+              ),
+              _row(
                 iconBg: const Color(0xFF8B5CF6),
                 icon: Icons.notifications_outlined,
                 label: 'Notifications',
+                value: '',
+                onTap: () => Navigator.push(context,
+                    MaterialPageRoute(
+                        builder: (_) => const NotificationsScreen())),
+              ),
+              _switchRow(
+                iconBg: const Color(0xFF8B5CF6),
+                icon: Icons.notifications_active_outlined,
+                label: 'Push Notifications',
                 value: user.notificationsEnabled,
                 onChanged: _toggleNotifications,
               ),

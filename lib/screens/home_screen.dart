@@ -124,8 +124,6 @@ class _HomeScreenState extends State<HomeScreen>
                   else if (_error != null)
                     SliverFillRemaining(child: _buildError())
                   else ...[
-                    // ── Category Browser ──────────────────────────────
-                    _buildCategoryBrowser(),
                     // ── Featured ──────────────────────────────────────
                     _buildSectionHeader('✨ Top Picks', seeAllLabel: l10n.seeAll, onSeeAll: () {
                       Navigator.push(context, slideRightRoute(const SearchScreen()));
@@ -194,7 +192,7 @@ class _HomeScreenState extends State<HomeScreen>
 
   Widget _buildAppBar(String name, bool isAr) {
     return SliverAppBar(
-      expandedHeight: 250,
+      expandedHeight: 320,
       floating: false,
       pinned: true,
       backgroundColor: Colors.black,
@@ -363,6 +361,65 @@ class _HomeScreenState extends State<HomeScreen>
                         ),
                       ),
                     ),
+                    const SizedBox(height: 12),
+                    // ── Category chips (below search) ──────────────
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: [
+                          ('All',         null,         '🌍'),
+                          ('Historical',  'historical', '🏛️'),
+                          ('Beach',       'beach',      '🏖️'),
+                          ('Desert',      'desert',     '🏜️'),
+                          ('Museum',      'museum',     '🏺'),
+                          ('Religious',   'religious',  '🕌'),
+                          ('Nature',      'nature',     '🌿'),
+                          ('Market',      'market',     '🛍️'),
+                          ('Cruise',      'cruise',     '🚢'),
+                          ('Restaurants', 'restaurant', '🍽️'),
+                          ('Hotels',      'hotel',      '🏨'),
+                        ].map((cat) {
+                          final label = cat.$1;
+                          final id    = cat.$2;
+                          final emoji = cat.$3;
+                          return GestureDetector(
+                            onTap: () => Navigator.push(
+                              context,
+                              slideRightRoute(id == null
+                                  ? const SearchScreen()
+                                  : SearchScreen(initialCategory: id)),
+                            ),
+                            child: Container(
+                              margin: const EdgeInsets.only(right: 8),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 7),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.15),
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                    color: Colors.white.withOpacity(0.35)),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(emoji,
+                                      style: const TextStyle(fontSize: 13)),
+                                  const SizedBox(width: 5),
+                                  Text(
+                                    label,
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 12,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -467,69 +524,6 @@ class _HomeScreenState extends State<HomeScreen>
             locale: isAr ? 'ar' : 'en',
             onTap: () => _openPlace(places[i]),
             onFavTap: () => setState(() {}),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCategoryBrowser() {
-    final cats = [
-      ('All',         null,         '🌍'),
-      ('Historical',  'historical', '🏛️'),
-      ('Beach',       'beach',      '🏖️'),
-      ('Desert',      'desert',     '🏜️'),
-      ('Museum',      'museum',     '🏺'),
-      ('Religious',   'religious',  '🕌'),
-      ('Nature',      'nature',     '🌿'),
-      ('Market',      'market',     '🛍️'),
-      ('Cruise',      'cruise',     '🚢'),
-      ('Restaurants', 'restaurant', '🍽️'),
-      ('Hotels',      'hotel',      '🏨'),
-    ];
-
-    return SliverToBoxAdapter(
-      child: Container(
-        color: Colors.white,
-        padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: cats.map((cat) {
-              final (label, id, emoji) = cat;
-              return GestureDetector(
-                onTap: () => Navigator.push(
-                  context,
-                  slideRightRoute(id == null
-                      ? const SearchScreen()
-                      : SearchScreen(initialCategory: id)),
-                ),
-                child: Container(
-                  margin: const EdgeInsets.only(right: 10),
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 14, vertical: 8),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: const Color(0xFFE5E7EB)),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(emoji, style: const TextStyle(fontSize: 14)),
-                      const SizedBox(width: 6),
-                      Text(
-                        label,
-                        style: GoogleFonts.poppins(
-                          fontSize: 13,
-                          color: AppColors.textSecondary,
-                          fontWeight: FontWeight.normal,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            }).toList(),
           ),
         ),
       ),

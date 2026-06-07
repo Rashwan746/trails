@@ -114,8 +114,20 @@ class _OverviewScreenState extends State<OverviewScreen> {
   Future<void> _openDirections() async {
     final lat = _place.location.latitude;
     final lng = _place.location.longitude;
-    final url = Uri.parse('https://maps.google.com/maps?daddr=$lat,$lng');
-    if (await canLaunchUrl(url)) launchUrl(url);
+    final name = Uri.encodeComponent('${_place.getName('en')}, Egypt');
+
+    // Use coordinates if valid, otherwise fall back to place name search
+    final Uri url = (lat != 0 && lng != 0)
+        ? Uri.parse(
+            'https://www.google.com/maps/dir/?api=1&destination=$lat,$lng&travelmode=driving')
+        : Uri.parse('https://www.google.com/maps/search/$name');
+
+    try {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    } catch (_) {
+      // Fallback: open in browser
+      await launchUrl(url, mode: LaunchMode.platformDefault);
+    }
   }
 
   @override

@@ -1,5 +1,6 @@
-import 'dart:ui';
+﻿import 'dart:ui';
 import 'package:flutter/material.dart';
+import '../utils/app_font.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -177,7 +178,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(msg, style: GoogleFonts.poppins(fontSize: 13)),
+        content: Text(msg, style: appFont(fontSize: 13)),
         backgroundColor: Colors.black87,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -313,11 +314,11 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                                   controller: _searchCtrl,
                                   focusNode:  _searchFocus,
                                   onTap: () => setState(() => _searchActive = true),
-                                  style: GoogleFonts.poppins(fontSize: 13, color: Colors.white, fontWeight: FontWeight.w500),
+                                  style: appFont(fontSize: 13, color: Colors.white, fontWeight: FontWeight.w500),
                                   cursorColor: Colors.white,
                                   decoration: InputDecoration(
                                     hintText: 'Search places...',
-                                    hintStyle: GoogleFonts.poppins(fontSize: 13, color: Colors.white38, fontWeight: FontWeight.w400),
+                                    hintStyle: appFont(fontSize: 13, color: Colors.white38, fontWeight: FontWeight.w400),
                                     border: InputBorder.none, isDense: true,
                                     contentPadding: const EdgeInsets.symmetric(vertical: 14),
                                   ),
@@ -369,9 +370,9 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                                     child: Icon(Icons.place_rounded, color: _categoryColor(p.category), size: 18),
                                   ),
                                   title: Text(p.getName('en'),
-                                    style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white)),
+                                    style: appFont(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white)),
                                   subtitle: Text(p.governorate,
-                                    style: GoogleFonts.poppins(fontSize: 11, color: Colors.white54)),
+                                    style: appFont(fontSize: 11, color: Colors.white54)),
                                   onTap: () { _searchCtrl.clear(); _animateToPlace(p); },
                                 );
                               },
@@ -417,7 +418,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                                         Icon(icon, size: 13, color: Colors.white),
                                         const SizedBox(width: 5),
                                         Text(label.toUpperCase(),
-                                          style: GoogleFonts.poppins(
+                                          style: appFont(
                                             fontSize: 10.5, fontWeight: FontWeight.w700,
                                             color: Colors.white, letterSpacing: 0.4,
                                           ),
@@ -458,7 +459,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                             SizedBox(width: 14, height: 14,
                               child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white.withOpacity(0.85))),
                             const SizedBox(width: 10),
-                            Text('Loading places...', style: GoogleFonts.poppins(fontSize: 12, color: Colors.white)),
+                            Text('Loading places...', style: appFont(fontSize: 12, color: Colors.white)),
                           ],
                         ),
                       ),
@@ -546,7 +547,7 @@ class _MapPin extends StatelessWidget {
                   boxShadow: [BoxShadow(color: color.withOpacity(0.3), blurRadius: 10, offset: const Offset(0, 3))],
                 ),
                 child: Text(label,
-                  style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
+                  style: appFont(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
                   maxLines: 1, overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -636,7 +637,7 @@ class _PlaceGlassCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(place.getName('en'),
-                            style: GoogleFonts.poppins(
+                            style: appFont(
                               fontSize: 20, fontWeight: FontWeight.w700,
                               color: Colors.white, height: 1.2,
                             ),
@@ -648,16 +649,16 @@ class _PlaceGlassCard extends StatelessWidget {
                             const Icon(Icons.star_rounded, color: AppColors.starColor, size: 15),
                             const SizedBox(width: 3),
                             Text(place.avgRating.toStringAsFixed(1),
-                              style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w700, color: Colors.white)),
+                              style: appFont(fontSize: 13, fontWeight: FontWeight.w700, color: Colors.white)),
                             const SizedBox(width: 4),
                             Text('(${formatCount(place.reviewCount)} reviews)',
-                              style: GoogleFonts.poppins(fontSize: 11.5, color: Colors.white60)),
+                              style: appFont(fontSize: 11.5, color: Colors.white60)),
                             const SizedBox(width: 6),
                             Container(width: 3, height: 3,
                               decoration: const BoxDecoration(color: Colors.white38, shape: BoxShape.circle)),
                             const SizedBox(width: 6),
                             Expanded(child: Text(categoryLabel(place.category),
-                              style: GoogleFonts.poppins(fontSize: 11.5, color: Colors.white60),
+                              style: appFont(fontSize: 11.5, color: Colors.white60),
                               overflow: TextOverflow.ellipsis)),
                           ]),
                           const SizedBox(height: 14),
@@ -669,7 +670,7 @@ class _PlaceGlassCard extends StatelessWidget {
                               onPressed: onViewDetails,
                               icon: const Icon(Icons.near_me_rounded, color: Colors.white, size: 16),
                               label: Text('Get Directions',
-                                style: GoogleFonts.poppins(
+                                style: appFont(
                                   fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.primary,
@@ -754,7 +755,7 @@ class _PlaceGlassCard extends StatelessWidget {
                               ),
                               child: Center(
                                 child: Text(categoryLabel(place.category),
-                                  style: GoogleFonts.poppins(fontSize: 10, fontWeight: FontWeight.w600, color: Colors.white),
+                                  style: appFont(fontSize: 10, fontWeight: FontWeight.w600, color: Colors.white),
                                   overflow: TextOverflow.ellipsis),
                               ),
                             ),
@@ -819,7 +820,7 @@ class _GlassChip extends StatelessWidget {
               children: [
                 Icon(icon, size: 14, color: col),
                 const SizedBox(width: 5),
-                Text(label, style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w500, color: col)),
+                Text(label, style: appFont(fontSize: 12, fontWeight: FontWeight.w500, color: col)),
               ],
             ),
           ),

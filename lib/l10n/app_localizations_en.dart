@@ -349,4 +349,38 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dontHaveAccount => 'Don\'t have an account? Register';
+
+  // ── Home screen ──────────────────────────────────────────────────────
+  @override String get heroLine1 => 'Hey, Traveler! Tell us';
+  @override String get heroLine2 => 'where you want to go';
+  @override String get searchPlacesLabel => 'Search places';
+  @override String get searchSubLabel => 'temples, food, or hotels....';
+  @override String get topPicks => 'Top Picks';
+  @override String get restaurants => 'Restaurants';
+  @override String get hotelsLabel => 'Hotels';
+  @override String get nearbyGems => 'Nearby Gems';
+  @override String get discover => 'Discover';
+  @override String get more => 'More';
+  @override String get exploreEgypt => 'Explore Egypt';
+  @override String get searchDetailedHint => 'Search pyramids, beaches, Cairo...';
+
+  // ── Map / Category labels ────────────────────────────────────────────
+  @override String get attractions => 'Attractions';
+  @override String get dining => 'Dining';
+  @override String get beaches => 'Beaches';
+
+  // ── Profile / Settings ──────────────────────────────────────────────
+  @override String get preferences => 'PREFERENCES';
+  @override String get accountSettings => 'ACCOUNT SETTINGS';
+  @override String get pushNotifications => 'Push Notifications';
+  @override String get locationAccess => 'Location Access';
+  @override String get helpSupport => 'Help & Support';
+  @override String get appSettings => 'App Settings';
+  @override String get logOut => 'Log Out';
+  @override String get planYourJourney => 'Plan your journey';
+  @override String get whileUsing => 'While Using';
+  @override String get travelEnthusiast => 'Travel Enthusiast';
+
+  // ── Misc ────────────────────────────────────────────────────────────
+  @override String get mostRecommended => 'MOST RECOMMENDED';
 }

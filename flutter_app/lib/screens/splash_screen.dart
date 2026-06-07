@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import '../utils/app_font.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../constants/app_colors.dart';
 
@@ -113,7 +114,7 @@ class _SplashScreenState extends State<SplashScreen>
                       children: [
                         Text(
                           'Discover Egypt',
-                          style: GoogleFonts.poppins(
+                          style: appFont(
                             color: Colors.white,
                             fontSize: 28,
                             fontWeight: FontWeight.bold,

@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import '../utils/app_font.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../constants/app_colors.dart';
 import '../l10n/app_localizations.dart';
@@ -50,12 +51,12 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
         title: Column(
           children: [
             Text(l10n.reviews,
-                style: GoogleFonts.poppins(
+                style: appFont(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
                     color: AppColors.textPrimary)),
             Text(widget.place.getName('en'),
-                style: GoogleFonts.poppins(
+                style: appFont(
                     fontSize: 11, color: AppColors.textSecondary)),
           ],
         ),
@@ -103,7 +104,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
           },
           icon: const Icon(Icons.edit_rounded, color: Colors.white, size: 18),
           label: Text(l10n.writeReview,
-              style: GoogleFonts.poppins(
+              style: appFont(
                   color: Colors.white, fontWeight: FontWeight.w600)),
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.primary,
@@ -131,7 +132,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
             children: [
               Text(
                 place.avgRating.toStringAsFixed(1),
-                style: GoogleFonts.poppins(
+                style: appFont(
                   fontSize: 46,
                   fontWeight: FontWeight.bold,
                   color: AppColors.textPrimary,
@@ -152,7 +153,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
               const SizedBox(height: 2),
               Text(
                 '${place.reviewCount} reviews',
-                style: GoogleFonts.poppins(
+                style: appFont(
                     color: AppColors.textSecondary, fontSize: 11.5),
               ),
             ],
@@ -183,7 +184,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
       child: Row(
         children: [
           Text('$stars',
-              style: GoogleFonts.poppins(
+              style: appFont(
                   fontSize: 11, color: AppColors.textSecondary)),
           const SizedBox(width: 3),
           const Icon(Icons.star_rounded, size: 11, color: AppColors.starColor),
@@ -206,7 +207,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
             child: Text(
               pctText,
               textAlign: TextAlign.right,
-              style: GoogleFonts.poppins(
+              style: appFont(
                   fontSize: 11,
                   color: AppColors.textSecondary,
                   fontWeight: FontWeight.w500),
@@ -255,9 +256,9 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
           const Text('⭐', style: TextStyle(fontSize: 64)),
           const SizedBox(height: 16),
           Text(l10n.noReviews,
-              style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.bold)),
+              style: appFont(fontSize: 20, fontWeight: FontWeight.bold)),
           Text('Be the first to review!',
-              style: GoogleFonts.poppins(color: AppColors.textSecondary)),
+              style: appFont(color: AppColors.textSecondary)),
         ],
       ),
     );
@@ -294,7 +295,7 @@ class _SortChip extends StatelessWidget {
                 color: isSelected ? Colors.white : AppColors.textSecondary),
             const SizedBox(width: 5),
             Text(label,
-                style: GoogleFonts.poppins(
+                style: appFont(
                     fontSize: 12,
                     color: isSelected ? Colors.white : AppColors.textSecondary,
                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal)),
@@ -346,7 +347,7 @@ class _ReviewCard extends StatelessWidget {
                     : null,
                 child: review.user.avatarUrl.isEmpty
                     ? Text(review.user.initials,
-                        style: GoogleFonts.poppins(
+                        style: appFont(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
                             fontSize: 13))
@@ -360,7 +361,7 @@ class _ReviewCard extends StatelessWidget {
                     Row(
                       children: [
                         Text(review.user.fullName,
-                            style: GoogleFonts.poppins(
+                            style: appFont(
                                 fontWeight: FontWeight.w600, fontSize: 14)),
                         const SizedBox(width: 6),
                         if (review.user.country?.isNotEmpty == true)
@@ -387,7 +388,7 @@ class _ReviewCard extends StatelessWidget {
                         const SizedBox(width: 8),
                         Text(
                           _relativeTime(review.createdAt),
-                          style: GoogleFonts.poppins(
+                          style: appFont(
                               color: AppColors.textLight, fontSize: 11),
                         ),
                       ],
@@ -403,7 +404,7 @@ class _ReviewCard extends StatelessWidget {
           // Review text
           Text(
             review.text,
-            style: GoogleFonts.poppins(
+            style: appFont(
                 color: AppColors.textSecondary, fontSize: 14, height: 1.6),
           ),
 
@@ -422,7 +423,7 @@ class _ReviewCard extends StatelessWidget {
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Text(t,
-                            style: GoogleFonts.poppins(
+                            style: appFont(
                                 fontSize: 11, color: AppColors.primary)),
                       ))
                   .toList(),
@@ -457,7 +458,7 @@ class _ReviewCard extends StatelessWidget {
                       const SizedBox(width: 5),
                       Text(
                         '${l10n.helpful} (${review.helpfulCount})',
-                        style: GoogleFonts.poppins(
+                        style: appFont(
                             color: AppColors.textSecondary, fontSize: 12),
                       ),
                     ],
@@ -480,7 +481,7 @@ class _ReviewCard extends StatelessWidget {
                     const SizedBox(width: 5),
                     Text(
                       'Reply',
-                      style: GoogleFonts.poppins(
+                      style: appFont(
                           color: AppColors.textSecondary, fontSize: 12),
                     ),
                   ],
@@ -522,7 +523,7 @@ class _ReviewCard extends StatelessWidget {
                   child: Center(
                     child: Text(
                       '+$extra',
-                      style: GoogleFonts.poppins(
+                      style: appFont(
                         color: Colors.white,
                         fontSize: 20,
                         fontWeight: FontWeight.bold,

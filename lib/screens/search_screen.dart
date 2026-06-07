@@ -1,6 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import '../utils/app_font.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../constants/app_colors.dart';
+import '../l10n/app_localizations.dart';
 import '../models/place_model.dart';
 import '../services/places_service.dart';
 import '../services/analytics_service.dart';
@@ -26,18 +28,18 @@ class _SearchScreenState extends State<SearchScreen> {
   int _total = 0;
   SearchFilters _filters = const SearchFilters();
 
-  final List<Map<String, dynamic>> _categories = [
-    {'id': 'all',        'label': 'All',         'icon': Icons.public_rounded},
-    {'id': 'historical', 'label': 'Historical',  'icon': Icons.account_balance_rounded},
-    {'id': 'beach',      'label': 'Beach',        'icon': Icons.beach_access_rounded},
-    {'id': 'desert',     'label': 'Desert',       'icon': Icons.wb_sunny_rounded},
-    {'id': 'museum',     'label': 'Museum',       'icon': Icons.museum_rounded},
-    {'id': 'religious',  'label': 'Religious',    'icon': Icons.mosque_rounded},
-    {'id': 'nature',     'label': 'Nature',       'icon': Icons.forest_rounded},
-    {'id': 'market',     'label': 'Market',       'icon': Icons.storefront_rounded},
-    {'id': 'cruise',     'label': 'Cruise',       'icon': Icons.directions_boat_rounded},
-    {'id': 'restaurant', 'label': 'Dining',       'icon': Icons.restaurant_rounded},
-    {'id': 'hotel',      'label': 'Hotels',       'icon': Icons.bed_rounded},
+  List<Map<String, dynamic>> _buildCategories(AppLocalizations l10n) => [
+    {'id': 'all',        'label': l10n.all,         'icon': Icons.public_rounded},
+    {'id': 'historical', 'label': l10n.historical,  'icon': Icons.account_balance_rounded},
+    {'id': 'beach',      'label': l10n.beach,        'icon': Icons.beach_access_rounded},
+    {'id': 'desert',     'label': l10n.desert,       'icon': Icons.wb_sunny_rounded},
+    {'id': 'museum',     'label': l10n.museum,       'icon': Icons.museum_rounded},
+    {'id': 'religious',  'label': l10n.religious,    'icon': Icons.mosque_rounded},
+    {'id': 'nature',     'label': l10n.nature,       'icon': Icons.forest_rounded},
+    {'id': 'market',     'label': l10n.market,       'icon': Icons.storefront_rounded},
+    {'id': 'cruise',     'label': l10n.cruise,       'icon': Icons.directions_boat_rounded},
+    {'id': 'restaurant', 'label': l10n.dining,       'icon': Icons.restaurant_rounded},
+    {'id': 'hotel',      'label': l10n.hotelsLabel,  'icon': Icons.bed_rounded},
   ];
 
   @override
@@ -95,10 +97,11 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text('Explore Egypt', style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
+        title: Text(l10n.exploreEgypt, style: appFont(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.white,
         elevation: 0,
       ),
@@ -112,7 +115,7 @@ class _SearchScreenState extends State<SearchScreen> {
               child: Row(
                 children: [
                   Text('$_total places found',
-                      style: GoogleFonts.poppins(
+                      style: appFont(
                           fontSize: 13, color: AppColors.textSecondary,
                           fontWeight: FontWeight.w500)),
                 ],
@@ -125,6 +128,7 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Widget _buildSearchBar() {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.all(16),
       child: TextField(
@@ -132,8 +136,8 @@ class _SearchScreenState extends State<SearchScreen> {
         onSubmitted: (_) => _search(),
         onChanged: (v) { if (v.isEmpty) _search(); },
         decoration: InputDecoration(
-          hintText: 'Search pyramids, beaches, Cairo...',
-          hintStyle: GoogleFonts.poppins(color: AppColors.textLight, fontSize: 14),
+          hintText: l10n.searchDetailedHint,
+          hintStyle: appFont(color: AppColors.textLight, fontSize: 14),
           prefixIcon: const Icon(Icons.search, color: AppColors.textSecondary),
           suffixIcon: _searchCtrl.text.isNotEmpty
               ? IconButton(
@@ -154,6 +158,8 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Widget _buildCategoryChips() {
+    final l10n = AppLocalizations.of(context)!;
+    final categories = _buildCategories(l10n);
     return Container(
       color: Colors.white,
       padding: const EdgeInsets.fromLTRB(16, 6, 16, 10),
@@ -161,10 +167,10 @@ class _SearchScreenState extends State<SearchScreen> {
         height: 36,
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
-          itemCount: _categories.length,
+          itemCount: categories.length,
           itemBuilder: (_, i) {
-            final cat = _categories[i];
-            final isSelected = (_selectedCategory ?? 'all') == cat['id'];
+            final cat = categories[i];
+            final isSelected = (_selectedCategory ?? 'all') == cat['id'] as String;
             return GestureDetector(
               onTap: () {
                 setState(() => _selectedCategory = cat['id'] as String);
@@ -193,7 +199,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     const SizedBox(width: 5),
                     Text(
                       cat['label'] as String,
-                      style: GoogleFonts.poppins(
+                      style: appFont(
                         fontSize: 13,
                         color: isSelected ? Colors.white : AppColors.textSecondary,
                         fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
@@ -221,10 +227,10 @@ class _SearchScreenState extends State<SearchScreen> {
             const Text('🔍', style: TextStyle(fontSize: 56)),
             const SizedBox(height: 16),
             Text('No places found',
-                style: GoogleFonts.poppins(
+                style: appFont(
                     fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
             Text('Try a different search or category',
-                style: GoogleFonts.poppins(color: AppColors.textSecondary)),
+                style: appFont(color: AppColors.textSecondary)),
           ],
         ),
       );

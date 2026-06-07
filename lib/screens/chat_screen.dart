@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import '../utils/app_font.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../constants/app_colors.dart';
 import '../services/chat_service.dart';
@@ -124,7 +125,7 @@ class _ChatScreenState extends State<ChatScreen> {
               children: [
                 Text(
                   'AI Assistant',
-                  style: GoogleFonts.poppins(
+                  style: appFont(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                     color: AppColors.textPrimary,
@@ -132,7 +133,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
                 Text(
                   'ONLINE',
-                  style: GoogleFonts.poppins(
+                  style: appFont(
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
                     color: AppColors.success,
@@ -197,7 +198,7 @@ class _ChatScreenState extends State<ChatScreen> {
             padding: const EdgeInsets.only(bottom: 10),
             child: Text(
               'SUGGESTIONS',
-              style: GoogleFonts.poppins(
+              style: appFont(
                 fontSize: 11,
                 fontWeight: FontWeight.w700,
                 color: AppColors.textSecondary,
@@ -245,7 +246,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         children: [
                           Text(
                             s.$4,
-                            style: GoogleFonts.poppins(
+                            style: appFont(
                               fontSize: 13.5,
                               fontWeight: FontWeight.w600,
                               color: AppColors.textPrimary,
@@ -253,7 +254,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           ),
                           Text(
                             s.$5,
-                            style: GoogleFonts.poppins(
+                            style: appFont(
                               fontSize: 11.5,
                               color: AppColors.textSecondary,
                             ),
@@ -305,11 +306,11 @@ class _ChatScreenState extends State<ChatScreen> {
                       maxLines: null,
                       textInputAction: TextInputAction.send,
                       onSubmitted: (_) => _send(),
-                      style: GoogleFonts.poppins(
+                      style: appFont(
                           fontSize: 14, color: AppColors.textPrimary),
                       decoration: InputDecoration(
                         hintText: 'Ask me anything about Egypt.....',
-                        hintStyle: GoogleFonts.poppins(
+                        hintStyle: appFont(
                             color: AppColors.textLight, fontSize: 13.5),
                         border: InputBorder.none,
                         isDense: true,
@@ -355,7 +356,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   const SizedBox(width: 4),
                   Text(
                     'You are currently in Cairo, Egypt',
-                    style: GoogleFonts.poppins(
+                    style: appFont(
                       fontSize: 11.5,
                       color: AppColors.textSecondary,
                     ),
@@ -409,7 +410,7 @@ class _MessageBubble extends StatelessWidget {
               ),
               child: Text(
                 message.content,
-                style: GoogleFonts.poppins(
+                style: appFont(
                   color: isUser ? Colors.white : AppColors.textPrimary,
                   fontSize: 14,
                   height: 1.5,

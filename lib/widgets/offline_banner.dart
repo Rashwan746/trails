@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import '../utils/app_font.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../services/connectivity_service.dart';
 
@@ -68,7 +69,7 @@ class _OfflineBannerState extends State<OfflineBanner>
               const SizedBox(width: 8),
               Text(
                 "You're offline — showing cached data",
-                style: GoogleFonts.poppins(
+                style: appFont(
                     color: Colors.white,
                     fontSize: 12,
                     fontWeight: FontWeight.w500),

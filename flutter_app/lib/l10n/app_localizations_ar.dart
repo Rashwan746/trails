@@ -349,4 +349,38 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get dontHaveAccount => 'ليس لديك حساب؟ إنشاء حساب';
+
+  // ── Home screen ──────────────────────────────────────────────────────
+  @override String get heroLine1 => 'مرحباً أيها المسافر!';
+  @override String get heroLine2 => 'أخبرنا أين تريد الذهاب';
+  @override String get searchPlacesLabel => 'ابحث عن أماكن';
+  @override String get searchSubLabel => 'معابد، طعام، فنادق...';
+  @override String get topPicks => 'أفضل الاختيارات';
+  @override String get restaurants => 'مطاعم';
+  @override String get hotelsLabel => 'فنادق';
+  @override String get nearbyGems => 'أماكن قريبة منك';
+  @override String get discover => 'استكشف';
+  @override String get more => 'المزيد';
+  @override String get exploreEgypt => 'استكشف مصر';
+  @override String get searchDetailedHint => 'ابحث عن أهرامات، شواطئ، القاهرة...';
+
+  // ── Map / Category labels ────────────────────────────────────────────
+  @override String get attractions => 'معالم سياحية';
+  @override String get dining => 'مطاعم';
+  @override String get beaches => 'شواطئ';
+
+  // ── Profile / Settings ──────────────────────────────────────────────
+  @override String get preferences => 'التفضيلات';
+  @override String get accountSettings => 'إعدادات الحساب';
+  @override String get pushNotifications => 'الإشعارات الفورية';
+  @override String get locationAccess => 'الوصول للموقع';
+  @override String get helpSupport => 'المساعدة والدعم';
+  @override String get appSettings => 'إعدادات التطبيق';
+  @override String get logOut => 'تسجيل الخروج';
+  @override String get planYourJourney => 'خطط رحلتك';
+  @override String get whileUsing => 'أثناء الاستخدام';
+  @override String get travelEnthusiast => 'عاشق السفر';
+
+  // ── Misc ────────────────────────────────────────────────────────────
+  @override String get mostRecommended => 'الأكثر توصية';
 }

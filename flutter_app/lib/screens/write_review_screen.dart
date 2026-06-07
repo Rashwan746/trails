@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import '../utils/app_font.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../constants/app_colors.dart';
@@ -75,7 +76,7 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
           onPressed: () => Navigator.pop(context),
           child: Text(
             l10n.cancel,
-            style: GoogleFonts.poppins(
+            style: appFont(
                 color: AppColors.primary,
                 fontSize: 15,
                 fontWeight: FontWeight.w500),
@@ -86,7 +87,7 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
           children: [
             Text(
               l10n.writeReview,
-              style: GoogleFonts.poppins(
+              style: appFont(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
                   color: AppColors.textPrimary),
@@ -99,7 +100,7 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
                 const SizedBox(width: 3),
                 Text(
                   widget.place.getName('en'),
-                  style: GoogleFonts.poppins(
+                  style: appFont(
                       fontSize: 11, color: AppColors.textSecondary),
                 ),
               ],
@@ -136,13 +137,13 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
                         ? Text(
                             'Tap to rate',
                             key: const ValueKey('tap'),
-                            style: GoogleFonts.poppins(
+                            style: appFont(
                                 color: AppColors.textSecondary, fontSize: 12.5),
                           )
                         : Text(
                             _ratingLabels[_stars.toInt() - 1].toUpperCase(),
                             key: ValueKey(_stars.toInt()),
-                            style: GoogleFonts.poppins(
+                            style: appFont(
                                 color: AppColors.starColor,
                                 fontSize: 12.5,
                                 fontWeight: FontWeight.w700,
@@ -157,7 +158,7 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
 
             // Add Photos section
             Text('Add Photos',
-                style: GoogleFonts.poppins(
+                style: appFont(
                     fontWeight: FontWeight.bold, fontSize: 15,
                     color: AppColors.textPrimary)),
             const SizedBox(height: 10),
@@ -183,7 +184,7 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
                             color: AppColors.textSecondary, size: 22),
                         const SizedBox(height: 3),
                         Text('ADD',
-                            style: GoogleFonts.poppins(
+                            style: appFont(
                                 fontSize: 10,
                                 fontWeight: FontWeight.w700,
                                 color: AppColors.textSecondary,
@@ -197,7 +198,7 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
 
             const SizedBox(height: 20),
             Text('Your Experience',
-                style: GoogleFonts.poppins(
+                style: appFont(
                     fontWeight: FontWeight.bold, fontSize: 15,
                     color: AppColors.textPrimary)),
             const SizedBox(height: 10),
@@ -208,7 +209,7 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
               maxLength: 1000,
               decoration: InputDecoration(
                 hintText: 'Share your experience here...',
-                hintStyle: GoogleFonts.poppins(color: AppColors.textLight, fontSize: 13),
+                hintStyle: appFont(color: AppColors.textLight, fontSize: 13),
                 filled: true,
                 fillColor: Colors.white,
                 border: OutlineInputBorder(
@@ -222,7 +223,7 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
 
             const SizedBox(height: 20),
             Text('Tag your interests',
-                style: GoogleFonts.poppins(
+                style: appFont(
                     fontWeight: FontWeight.bold, fontSize: 15,
                     color: AppColors.textPrimary)),
             const SizedBox(height: 12),
@@ -251,7 +252,7 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
                           ),
                           child: Text(
                             tag,
-                            style: GoogleFonts.poppins(
+                            style: appFont(
                               fontSize: 13,
                               color: _selectedTags.contains(tag)
                                   ? Colors.white
@@ -289,7 +290,7 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
                               color: Colors.white, size: 18),
                           const SizedBox(width: 8),
                           Text('Post',
-                              style: GoogleFonts.poppins(
+                              style: appFont(
                                   color: Colors.white,
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600)),

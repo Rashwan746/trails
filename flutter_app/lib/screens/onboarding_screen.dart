@@ -1,5 +1,6 @@
-import 'dart:ui';
+﻿import 'dart:ui';
 import 'package:flutter/material.dart';
+import '../utils/app_font.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import '../constants/app_colors.dart';
@@ -201,7 +202,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                                 const SizedBox(width: 5),
                                 Text(
                                   _pages[_currentPage].location,
-                                  style: GoogleFonts.poppins(
+                                  style: appFont(
                                     color: Colors.white,
                                     fontSize: 11,
                                     fontWeight: FontWeight.w600,
@@ -230,7 +231,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                       ),
                       child: Text(
                         'Skip',
-                        style: GoogleFonts.poppins(
+                        style: appFont(
                           color: Colors.white,
                           fontSize: 13,
                           fontWeight: FontWeight.w500,
@@ -356,7 +357,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                 child: RichText(
                   textAlign: TextAlign.center,
                   text: TextSpan(
-                    style: GoogleFonts.poppins(
+                    style: appFont(
                       fontSize: 28,
                       fontWeight: FontWeight.w800,
                       color: const Color(0xFF111827),
@@ -388,7 +389,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                 child: Text(
                   page.description,
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.poppins(
+                  style: appFont(
                     fontSize: 14,
                     color: const Color(0xFF6B7280),
                     height: 1.65,
@@ -421,7 +422,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                     ),
                     child: Text(
                       page.buttonLabel,
-                      style: GoogleFonts.poppins(
+                      style: appFont(
                           fontSize: 16,
                           fontWeight: FontWeight.w600),
                     ),

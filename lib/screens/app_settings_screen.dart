@@ -1,5 +1,6 @@
-import 'dart:typed_data';
+﻿import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import '../utils/app_font.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
@@ -60,19 +61,19 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
       builder: (_) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text('Clear Cache',
-            style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
+            style: appFont(fontWeight: FontWeight.bold)),
         content: Text('This will clear all cached data. You may need to reload content.',
-            style: GoogleFonts.poppins(color: AppColors.textSecondary)),
+            style: appFont(color: AppColors.textSecondary)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
             child: Text('Cancel',
-                style: GoogleFonts.poppins(color: AppColors.textSecondary)),
+                style: appFont(color: AppColors.textSecondary)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             child: Text('Clear',
-                style: GoogleFonts.poppins(
+                style: appFont(
                     color: Colors.red, fontWeight: FontWeight.w600)),
           ),
         ],
@@ -87,7 +88,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Cache cleared',
-                style: GoogleFonts.poppins(color: Colors.white)),
+                style: appFont(color: Colors.white)),
             backgroundColor: AppColors.primary,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -116,7 +117,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text('App Settings',
-            style: GoogleFonts.poppins(
+            style: appFont(
                 color: AppColors.textPrimary,
                 fontWeight: FontWeight.bold, fontSize: 22)),
         centerTitle: false,
@@ -181,7 +182,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                         child: CircularProgressIndicator(
                             strokeWidth: 2, color: AppColors.primary))
                     : Text(_cacheSize,
-                        style: GoogleFonts.poppins(
+                        style: appFont(
                             color: AppColors.textSecondary, fontSize: 13)),
                 onTap: _clearing ? null : _clearCache,
               ),
@@ -229,13 +230,13 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text('Experience Egypt in Dark Mode',
-                            style: GoogleFonts.poppins(
+                            style: appFont(
                                 color: Colors.white,
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold)),
                         const SizedBox(height: 4),
                         Text('Our maps and guides look stunning in the dark.',
-                            style: GoogleFonts.poppins(
+                            style: appFont(
                                 color: Colors.white70,
                                 fontSize: 12)),
                       ],
@@ -254,7 +255,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
 
   Widget _sectionLabel(String text) {
     return Text(text,
-        style: GoogleFonts.poppins(
+        style: appFont(
             fontSize: 11, fontWeight: FontWeight.w700,
             color: AppColors.primary, letterSpacing: 0.8));
   }
@@ -299,7 +300,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
           const SizedBox(width: 14),
           Expanded(
             child: Text(label,
-                style: GoogleFonts.poppins(
+                style: appFont(
                     fontSize: 15, fontWeight: FontWeight.w500,
                     color: AppColors.textPrimary)),
           ),
@@ -341,7 +342,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
             const SizedBox(width: 14),
             Expanded(
               child: Text(label,
-                  style: GoogleFonts.poppins(
+                  style: appFont(
                       fontSize: 15, fontWeight: FontWeight.w500,
                       color: AppColors.textPrimary)),
             ),

@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import '../utils/app_font.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../constants/app_colors.dart';
 import '../services/api_service.dart';
@@ -149,7 +150,7 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
                   // ── Distance ───────────────────────────────────
                   _sectionTitle('Distance',
                       trailing: Text('Within ${_distance.toInt()} km',
-                        style: GoogleFonts.poppins(
+                        style: appFont(
                           fontSize: 13, color: AppColors.textSecondary,
                           fontWeight: FontWeight.w500))),
                   const SizedBox(height: 4),
@@ -197,7 +198,7 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
                   else
                     Text(
                       'Show $_liveCount Places',
-                      style: GoogleFonts.poppins(
+                      style: appFont(
                         color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
                     ),
                   const SizedBox(width: 8),
@@ -218,7 +219,7 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(title,
-          style: GoogleFonts.poppins(
+          style: appFont(
             fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
         if (trailing != null) trailing,
       ],
@@ -229,7 +230,7 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
     return GestureDetector(
       onTap: () {},
       child: Text('View Map',
-        style: GoogleFonts.poppins(
+        style: appFont(
           fontSize: 13, color: AppColors.primary, fontWeight: FontWeight.w500)),
     );
   }
@@ -265,7 +266,7 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
                     const SizedBox(width: 4),
                   ],
                   Text(gov['label'] as String,
-                    style: GoogleFonts.poppins(
+                    style: appFont(
                       fontSize: 13,
                       color: isSelected ? Colors.white : AppColors.textSecondary,
                       fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal)),
@@ -309,7 +310,7 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
                     color: isSelected ? Colors.white : AppColors.textSecondary),
                   const SizedBox(width: 6),
                   Text(label,
-                    style: GoogleFonts.poppins(
+                    style: appFont(
                       fontSize: 13,
                       color: isSelected ? Colors.white : AppColors.textSecondary,
                       fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
@@ -347,8 +348,8 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('1 km',  style: GoogleFonts.poppins(fontSize: 11, color: AppColors.textLight)),
-              Text('50 km', style: GoogleFonts.poppins(fontSize: 11, color: AppColors.textLight)),
+              Text('1 km',  style: appFont(fontSize: 11, color: AppColors.textLight)),
+              Text('50 km', style: appFont(fontSize: 11, color: AppColors.textLight)),
             ],
           ),
         ),
@@ -401,7 +402,7 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
                   const SizedBox(height: 5),
                   Text(
                     '${rating.toStringAsFixed(1)}+',
-                    style: GoogleFonts.poppins(
+                    style: appFont(
                       fontSize: 13,
                       color: isSelected ? AppColors.primary : AppColors.textSecondary,
                       fontWeight: isSelected ? FontWeight.w700 : FontWeight.normal,

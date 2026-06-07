@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import '../utils/app_font.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../constants/app_colors.dart';
 import '../services/notification_service.dart';
@@ -44,7 +45,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text('Notifications',
-            style: GoogleFonts.poppins(
+            style: appFont(
                 fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
         backgroundColor: Colors.white,
         elevation: 0,
@@ -67,7 +68,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 });
               },
               child: Text('Mark all read',
-                  style: GoogleFonts.poppins(
+                  style: appFont(
                       color: AppColors.primary,
                       fontSize: 12,
                       fontWeight: FontWeight.w600)),
@@ -108,14 +109,14 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           ),
           const SizedBox(height: 20),
           Text('No notifications yet',
-              style: GoogleFonts.poppins(
+              style: appFont(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   color: AppColors.textPrimary)),
           const SizedBox(height: 8),
           Text("We'll notify you about special\noffers and travel tips!",
               textAlign: TextAlign.center,
-              style: GoogleFonts.poppins(
+              style: appFont(
                   color: AppColors.textSecondary, fontSize: 13, height: 1.6)),
         ],
       ),
@@ -180,7 +181,7 @@ class _NotificationTile extends StatelessWidget {
                       Expanded(
                         child: Text(
                           notification.title,
-                          style: GoogleFonts.poppins(
+                          style: appFont(
                             fontWeight: notification.isRead
                                 ? FontWeight.w500
                                 : FontWeight.w700,
@@ -204,7 +205,7 @@ class _NotificationTile extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     notification.body,
-                    style: GoogleFonts.poppins(
+                    style: appFont(
                         fontSize: 13,
                         color: AppColors.textSecondary,
                         height: 1.4),
@@ -212,7 +213,7 @@ class _NotificationTile extends StatelessWidget {
                   const SizedBox(height: 6),
                   Text(
                     _timeAgo(notification.sentAt),
-                    style: GoogleFonts.poppins(
+                    style: appFont(
                         fontSize: 11, color: AppColors.textLight),
                   ),
                 ],

@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import '../utils/app_font.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../constants/app_colors.dart';
 import '../models/trip_model.dart';
@@ -65,7 +66,7 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text('Trip Planner', style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
+        title: Text('Trip Planner', style: appFont(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.white,
         elevation: 0,
       ),
@@ -73,7 +74,7 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
         onPressed: _createTrip,
         backgroundColor: AppColors.primary,
         icon: const Icon(Icons.add, color: Colors.white),
-        label: Text('New Trip', style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w600)),
+        label: Text('New Trip', style: appFont(color: Colors.white, fontWeight: FontWeight.w600)),
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
@@ -106,15 +107,15 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
           const Text('🗺️', style: TextStyle(fontSize: 72)),
           const SizedBox(height: 20),
           Text('No trips planned yet',
-              style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.bold)),
+              style: appFont(fontSize: 20, fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
           Text('Create your first Egypt itinerary!',
-              style: GoogleFonts.poppins(color: AppColors.textSecondary)),
+              style: appFont(color: AppColors.textSecondary)),
           const SizedBox(height: 32),
           ElevatedButton.icon(
             onPressed: _createTrip,
             icon: const Icon(Icons.add, color: Colors.white),
-            label: Text('Plan a Trip', style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w600)),
+            label: Text('Plan a Trip', style: appFont(color: Colors.white, fontWeight: FontWeight.w600)),
             style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
@@ -165,10 +166,10 @@ class _TripCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(trip.title,
-                          style: GoogleFonts.poppins(
+                          style: appFont(
                               fontWeight: FontWeight.bold, fontSize: 15)),
                       Text('${trip.durationDays} day${trip.durationDays > 1 ? 's' : ''} • ${trip.items.length} places',
-                          style: GoogleFonts.poppins(
+                          style: appFont(
                               color: AppColors.textSecondary, fontSize: 13)),
                     ],
                   ),
@@ -184,7 +185,7 @@ class _TripCard extends StatelessWidget {
               Text(trip.description,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.poppins(color: AppColors.textSecondary, fontSize: 13)),
+                  style: appFont(color: AppColors.textSecondary, fontSize: 13)),
             ],
             if (trip.startDate != null) ...[
               const SizedBox(height: 8),
@@ -194,7 +195,7 @@ class _TripCard extends StatelessWidget {
                   const SizedBox(width: 4),
                   Text(
                     '${trip.startDate!.day}/${trip.startDate!.month}/${trip.startDate!.year}',
-                    style: GoogleFonts.poppins(color: AppColors.textLight, fontSize: 12),
+                    style: appFont(color: AppColors.textLight, fontSize: 12),
                   ),
                 ],
               ),
@@ -253,7 +254,7 @@ class _TripDetailScreenState extends State<_TripDetailScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text(_trip.title, style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
+        title: Text(_trip.title, style: appFont(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.white,
         elevation: 0,
       ),
@@ -269,7 +270,7 @@ class _TripDetailScreenState extends State<_TripDetailScreen> {
         onPressed: _addPlace,
         backgroundColor: AppColors.secondary,
         icon: const Icon(Icons.add_location, color: Colors.white),
-        label: Text('Add Place', style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w600)),
+        label: Text('Add Place', style: appFont(color: Colors.white, fontWeight: FontWeight.w600)),
       ),
     );
   }
@@ -294,7 +295,7 @@ class _TripDetailScreenState extends State<_TripDetailScreen> {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text('Day $day',
-                  style: GoogleFonts.poppins(
+                  style: appFont(
                       fontSize: 13,
                       color: isSelected ? Colors.white : AppColors.textSecondary,
                       fontWeight: isSelected ? FontWeight.bold : FontWeight.normal)),
@@ -315,9 +316,9 @@ class _TripDetailScreenState extends State<_TripDetailScreen> {
             const Text('📍', style: TextStyle(fontSize: 48)),
             const SizedBox(height: 16),
             Text('No places for Day $day',
-                style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.bold)),
+                style: appFont(fontSize: 16, fontWeight: FontWeight.bold)),
             Text('Tap "Add Place" to plan your day',
-                style: GoogleFonts.poppins(color: AppColors.textSecondary)),
+                style: appFont(color: AppColors.textSecondary)),
           ],
         ),
       );
@@ -347,7 +348,7 @@ class _TripDetailScreenState extends State<_TripDetailScreen> {
                 ),
                 child: Center(
                   child: Text('${i + 1}',
-                      style: GoogleFonts.poppins(
+                      style: appFont(
                           color: Colors.white, fontWeight: FontWeight.bold)),
                 ),
               ),
@@ -357,12 +358,12 @@ class _TripDetailScreenState extends State<_TripDetailScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(item.place?.getName('en') ?? 'Unknown',
-                        style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 14)),
+                        style: appFont(fontWeight: FontWeight.w600, fontSize: 14)),
                     Text(item.place?.governorate ?? '',
-                        style: GoogleFonts.poppins(
+                        style: appFont(
                             color: AppColors.textSecondary, fontSize: 12)),
                     Text('~${item.visitDuration} min visit',
-                        style: GoogleFonts.poppins(
+                        style: appFont(
                             color: AppColors.textLight, fontSize: 11)),
                   ],
                 ),
@@ -388,7 +389,7 @@ class _PlacePickerDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('Select a Place', style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
+      title: Text('Select a Place', style: appFont(fontWeight: FontWeight.bold)),
       content: SizedBox(
         width: double.maxFinite,
         height: 400,
@@ -396,9 +397,9 @@ class _PlacePickerDialog extends StatelessWidget {
           itemCount: places.length,
           itemBuilder: (_, i) => ListTile(
             leading: const Text('🏛️', style: TextStyle(fontSize: 24)),
-            title: Text(places[i].getName('en'), style: GoogleFonts.poppins(fontSize: 13)),
+            title: Text(places[i].getName('en'), style: appFont(fontSize: 13)),
             subtitle: Text(places[i].governorate,
-                style: GoogleFonts.poppins(color: AppColors.textSecondary, fontSize: 11)),
+                style: appFont(color: AppColors.textSecondary, fontSize: 11)),
             onTap: () => Navigator.pop(context, places[i]),
           ),
         ),
@@ -455,7 +456,7 @@ class _CreateTripSheetState extends State<_CreateTripSheet> {
           ),
           const SizedBox(height: 20),
           Text('Create New Trip',
-              style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.bold)),
+              style: appFont(fontSize: 20, fontWeight: FontWeight.bold)),
           const SizedBox(height: 20),
           TextField(
             controller: _titleCtrl,
@@ -485,14 +486,14 @@ class _CreateTripSheetState extends State<_CreateTripSheet> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text('Duration: $_days day${_days > 1 ? 's' : ''}',
-                  style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 15)),
+                  style: appFont(fontWeight: FontWeight.w600, fontSize: 15)),
               Row(
                 children: [
                   IconButton(
                     onPressed: () { if (_days > 1) setState(() => _days--); },
                     icon: const Icon(Icons.remove_circle_outline, color: AppColors.secondary),
                   ),
-                  Text('$_days', style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.bold)),
+                  Text('$_days', style: appFont(fontSize: 20, fontWeight: FontWeight.bold)),
                   IconButton(
                     onPressed: () { if (_days < 30) setState(() => _days++); },
                     icon: const Icon(Icons.add_circle_outline, color: AppColors.secondary),
@@ -515,7 +516,7 @@ class _CreateTripSheetState extends State<_CreateTripSheet> {
               child: _loading
                   ? const CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
                   : Text('Create Trip',
-                      style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 16)),
+                      style: appFont(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 16)),
             ),
           ),
         ],

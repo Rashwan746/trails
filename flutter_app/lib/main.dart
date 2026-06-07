@@ -9,6 +9,7 @@ import 'constants/app_colors.dart';
 import 'providers/auth_provider.dart';
 import 'providers/locale_provider.dart';
 import 'providers/map_state_provider.dart';
+import 'utils/app_font.dart';
 import 'screens/splash_screen.dart';
 import 'screens/onboarding_screen.dart';
 import 'screens/auth_screen.dart';
@@ -61,19 +62,36 @@ class DiscoverEgyptApp extends StatelessWidget {
                 primary: AppColors.primary,
                 secondary: AppColors.secondary,
               ),
-              textTheme: GoogleFonts.poppinsTextTheme(),
+              textTheme: localeProvider.isArabic
+                  ? GoogleFonts.cairoTextTheme()
+                  : GoogleFonts.poppinsTextTheme(),
               scaffoldBackgroundColor: AppColors.background,
               appBarTheme: AppBarTheme(
                 backgroundColor: Colors.white,
                 elevation: 0,
                 iconTheme: const IconThemeData(color: AppColors.textPrimary),
-                titleTextStyle: GoogleFonts.poppins(
-                  color: AppColors.textPrimary,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                ),
+                titleTextStyle: localeProvider.isArabic
+                    ? GoogleFonts.cairo(
+                        color: AppColors.textPrimary,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      )
+                    : GoogleFonts.poppins(
+                        color: AppColors.textPrimary,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
               ),
             ),
+            builder: (context, child) {
+              // Ensure RTL direction for Arabic
+              return Directionality(
+                textDirection: localeProvider.isArabic
+                    ? TextDirection.rtl
+                    : TextDirection.ltr,
+                child: child!,
+              );
+            },
             home: const AppEntryPoint(),
           );
         },

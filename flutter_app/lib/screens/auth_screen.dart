@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import '../utils/app_font.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -94,7 +95,7 @@ class _AuthScreenState extends State<AuthScreen>
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text(msg,
-          style: GoogleFonts.poppins(fontSize: 13, color: Colors.white)),
+          style: appFont(fontSize: 13, color: Colors.white)),
       backgroundColor: error ? AppColors.error : AppColors.success,
       behavior: SnackBarBehavior.floating,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -219,17 +220,17 @@ class _AuthScreenState extends State<AuthScreen>
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20)),
               title: Text('Account Already Exists',
-                  style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
+                  style: appFont(fontWeight: FontWeight.bold)),
               content: Text(
                 'This phone number is already registered.\nWould you like to log in instead?',
-                style: GoogleFonts.poppins(
+                style: appFont(
                     fontSize: 14, color: AppColors.textSecondary),
               ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
                   child: Text('Cancel',
-                      style: GoogleFonts.poppins(
+                      style: appFont(
                           color: AppColors.textSecondary)),
                 ),
                 ElevatedButton(
@@ -247,7 +248,7 @@ class _AuthScreenState extends State<AuthScreen>
                         borderRadius: BorderRadius.circular(12)),
                   ),
                   child: Text('Log In',
-                      style: GoogleFonts.poppins(
+                      style: appFont(
                           color: Colors.white,
                           fontWeight: FontWeight.w600)),
                 ),
@@ -471,7 +472,7 @@ class _AuthScreenState extends State<AuthScreen>
                             const SizedBox(width: 6),
                             Text(
                               'NLE EGYPT',
-                              style: GoogleFonts.poppins(
+                              style: appFont(
                                 color: Colors.white,
                                 fontSize: 11,
                                 fontWeight: FontWeight.w700,
@@ -493,7 +494,7 @@ class _AuthScreenState extends State<AuthScreen>
                     children: [
                       Text(
                         'Trails',
-                        style: GoogleFonts.poppins(
+                        style: appFont(
                           color: Colors.white,
                           fontSize: 30,
                           fontWeight: FontWeight.bold,
@@ -503,7 +504,7 @@ class _AuthScreenState extends State<AuthScreen>
                       const SizedBox(height: 6),
                       Text(
                         'Ancient wonders await your journey.',
-                        style: GoogleFonts.poppins(
+                        style: appFont(
                           color: Colors.white.withOpacity(0.82),
                           fontSize: 13.5,
                         ),
@@ -530,9 +531,9 @@ class _AuthScreenState extends State<AuthScreen>
                             const EdgeInsets.fromLTRB(20, 18, 20, 0),
                         child: TabBar(
                           controller: _tabController,
-                          labelStyle: GoogleFonts.poppins(
+                          labelStyle: appFont(
                               fontWeight: FontWeight.w700, fontSize: 15),
-                          unselectedLabelStyle: GoogleFonts.poppins(
+                          unselectedLabelStyle: appFont(
                               fontWeight: FontWeight.w500, fontSize: 15),
                           labelColor: AppColors.primary,
                           unselectedLabelColor: AppColors.textSecondary,
@@ -571,7 +572,7 @@ class _AuthScreenState extends State<AuthScreen>
                                   horizontal: 14),
                               child: Text(
                                 'or continue with',
-                                style: GoogleFonts.poppins(
+                                style: appFont(
                                     color: AppColors.textSecondary,
                                     fontSize: 12),
                               ),
@@ -599,7 +600,7 @@ class _AuthScreenState extends State<AuthScreen>
                         onPressed: widget.onSkip ?? widget.onBack,
                         child: Text(
                           'Just looking? Skip for now',
-                          style: GoogleFonts.poppins(
+                          style: appFont(
                             color: AppColors.textSecondary,
                             fontSize: 13,
                             decoration: TextDecoration.underline,
@@ -648,7 +649,7 @@ class _AuthScreenState extends State<AuthScreen>
                   TextButton.styleFrom(padding: EdgeInsets.zero),
               child: Text(
                 'Forgot Password?',
-                style: GoogleFonts.poppins(
+                style: appFont(
                   color: AppColors.primary,
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
@@ -678,7 +679,7 @@ class _AuthScreenState extends State<AuthScreen>
                   color: Colors.white, size: 20),
               label: Text(
                 'Create Account',
-                style: GoogleFonts.poppins(
+                style: appFont(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
@@ -696,7 +697,7 @@ class _AuthScreenState extends State<AuthScreen>
           const SizedBox(height: 18),
           Text(
             'Create an account to start exploring Egypt\'s best\nrestaurants, attractions, and local gems.',
-            style: GoogleFonts.poppins(
+            style: appFont(
               color: AppColors.textSecondary,
               fontSize: 13,
               height: 1.6,
@@ -729,7 +730,7 @@ class _AuthScreenState extends State<AuthScreen>
 
               Text(
                 'Create Account',
-                style: GoogleFonts.poppins(
+                style: appFont(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
                   color: AppColors.textPrimary,
@@ -738,7 +739,7 @@ class _AuthScreenState extends State<AuthScreen>
               const SizedBox(height: 6),
               Text(
                 'Join thousands of travelers exploring the\nwonders of Egypt.',
-                style: GoogleFonts.poppins(
+                style: appFont(
                   color: AppColors.textSecondary,
                   fontSize: 13.5,
                   height: 1.5,
@@ -781,7 +782,7 @@ class _AuthScreenState extends State<AuthScreen>
               Center(
                 child: RichText(
                   text: TextSpan(
-                    style: GoogleFonts.poppins(
+                    style: appFont(
                         color: AppColors.textSecondary, fontSize: 12.5),
                     children: [
                       const TextSpan(
@@ -808,7 +809,7 @@ class _AuthScreenState extends State<AuthScreen>
                       setState(() => _currentScreen = _AuthScreen.welcome),
                   child: RichText(
                     text: TextSpan(
-                      style: GoogleFonts.poppins(
+                      style: appFont(
                           color: AppColors.textPrimary, fontSize: 13.5),
                       children: [
                         const TextSpan(text: 'Already have an account? '),
@@ -868,7 +869,7 @@ class _AuthScreenState extends State<AuthScreen>
 
                     Text(
                       'Verify Phone',
-                      style: GoogleFonts.poppins(
+                      style: appFont(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
                         color: AppColors.textPrimary,
@@ -879,7 +880,7 @@ class _AuthScreenState extends State<AuthScreen>
                     Text(
                       'Enter the 4-digit code sent to',
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.poppins(
+                      style: appFont(
                           color: AppColors.textSecondary, fontSize: 14),
                     ),
                     const SizedBox(height: 4),
@@ -888,7 +889,7 @@ class _AuthScreenState extends State<AuthScreen>
                       children: [
                         Text(
                           '+20 $phone',
-                          style: GoogleFonts.poppins(
+                          style: appFont(
                             color: AppColors.textPrimary,
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
@@ -912,7 +913,7 @@ class _AuthScreenState extends State<AuthScreen>
                         ),
                         child: Text(
                           'Dev OTP: $_pendingOtp',
-                          style: GoogleFonts.poppins(
+                          style: appFont(
                             color: AppColors.primary,
                             fontSize: 13.5,
                             fontWeight: FontWeight.w600,
@@ -936,7 +937,7 @@ class _AuthScreenState extends State<AuthScreen>
                       children: [
                         Text(
                           "Didn't receive the code?  ",
-                          style: GoogleFonts.poppins(
+                          style: appFont(
                               color: AppColors.textSecondary,
                               fontSize: 13.5),
                         ),
@@ -951,7 +952,7 @@ class _AuthScreenState extends State<AuthScreen>
                           },
                           child: Text(
                             'Resend Code',
-                            style: GoogleFonts.poppins(
+                            style: appFont(
                               color: AppColors.primary,
                               fontSize: 13.5,
                               fontWeight: FontWeight.w700,
@@ -971,7 +972,7 @@ class _AuthScreenState extends State<AuthScreen>
                                   color: AppColors.primary),
                               const SizedBox(height: 12),
                               Text('Verifying...',
-                                  style: GoogleFonts.poppins(
+                                  style: appFont(
                                       color: AppColors.textSecondary,
                                       fontSize: 13)),
                             ],
@@ -1034,7 +1035,7 @@ class _AuthScreenState extends State<AuthScreen>
         keyboardType: TextInputType.number,
         textAlign: TextAlign.center,
         maxLength: 1,
-        style: GoogleFonts.poppins(
+        style: appFont(
             fontSize: 26, fontWeight: FontWeight.bold),
         inputFormatters: [FilteringTextInputFormatter.digitsOnly],
         decoration: InputDecoration(
@@ -1142,7 +1143,7 @@ class _AuthScreenState extends State<AuthScreen>
                   const SizedBox(height: 36),
                   Text(
                     'Verification Successful',
-                    style: GoogleFonts.poppins(
+                    style: appFont(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
                       color: AppColors.textPrimary,
@@ -1155,7 +1156,7 @@ class _AuthScreenState extends State<AuthScreen>
                     child: Text(
                       'your account has been verified.\nyou can now start exploring egypt\'s best\nrestaurants, attractions , and local gems.',
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.poppins(
+                      style: appFont(
                         color: AppColors.textSecondary,
                         fontSize: 13.5,
                         height: 1.65,
@@ -1220,7 +1221,7 @@ class _AuthScreenState extends State<AuthScreen>
 
                     Text(
                       'Forget Password?',
-                      style: GoogleFonts.poppins(
+                      style: appFont(
                         fontSize: 26,
                         fontWeight: FontWeight.bold,
                         color: AppColors.textPrimary,
@@ -1233,7 +1234,7 @@ class _AuthScreenState extends State<AuthScreen>
                       child: Text(
                         'enter your email address or phone\nnumber and we will send you a link to\nreset your password.',
                         textAlign: TextAlign.center,
-                        style: GoogleFonts.poppins(
+                        style: appFont(
                           color: AppColors.textSecondary,
                           fontSize: 13.5,
                           height: 1.65,
@@ -1261,7 +1262,7 @@ class _AuthScreenState extends State<AuthScreen>
                 onTap: () {/* TODO: contact support screen */},
                 child: RichText(
                   text: TextSpan(
-                    style: GoogleFonts.poppins(
+                    style: appFont(
                         color: AppColors.textPrimary, fontSize: 13),
                     children: [
                       const TextSpan(text: 'Have trouble?  '),
@@ -1360,7 +1361,7 @@ class _AuthScreenState extends State<AuthScreen>
                   const SizedBox(height: 32),
                   Text(
                     'Reset Link Sent',
-                    style: GoogleFonts.poppins(
+                    style: appFont(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       color: AppColors.textPrimary,
@@ -1372,7 +1373,7 @@ class _AuthScreenState extends State<AuthScreen>
                     child: Text(
                       'We have sent a 4-digit verification code to\nyour phone number or email. Enter it\nbelow to reset your password.',
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.poppins(
+                      style: appFont(
                         color: AppColors.textSecondary,
                         fontSize: 13.5,
                         height: 1.65,
@@ -1398,7 +1399,7 @@ class _AuthScreenState extends State<AuthScreen>
                       ),
                       child: Text(
                         'Dev OTP: $_pendingOtp',
-                        style: GoogleFonts.poppins(
+                        style: appFont(
                           color: AppColors.primary,
                           fontSize: 13.5,
                           fontWeight: FontWeight.w600,
@@ -1419,7 +1420,7 @@ class _AuthScreenState extends State<AuthScreen>
                     children: [
                       Text(
                         "Didn't receive the code?  ",
-                        style: GoogleFonts.poppins(
+                        style: appFont(
                           color: AppColors.textSecondary,
                           fontSize: 13,
                         ),
@@ -1428,7 +1429,7 @@ class _AuthScreenState extends State<AuthScreen>
                         onTap: _forgotPassword,
                         child: Text(
                           'Resend',
-                          style: GoogleFonts.poppins(
+                          style: appFont(
                             color: AppColors.primary,
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
@@ -1487,7 +1488,7 @@ class _AuthScreenState extends State<AuthScreen>
                     const SizedBox(height: 28),
                     Text(
                       'Create New Password',
-                      style: GoogleFonts.poppins(
+                      style: appFont(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                         color: AppColors.textPrimary,
@@ -1498,7 +1499,7 @@ class _AuthScreenState extends State<AuthScreen>
                     Text(
                       'Your new password must be different\nfrom previously used passwords.',
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.poppins(
+                      style: appFont(
                         color: AppColors.textSecondary,
                         fontSize: 13.5,
                         height: 1.65,
@@ -1540,7 +1541,7 @@ class _AuthScreenState extends State<AuthScreen>
           color: AppColors.primary, size: 22),
       label: Text(
         label,
-        style: GoogleFonts.poppins(
+        style: appFont(
           color: AppColors.primary,
           fontWeight: FontWeight.w600,
           fontSize: 15,
@@ -1555,7 +1556,7 @@ class _AuthScreenState extends State<AuthScreen>
       alignment: Alignment.centerLeft,
       child: Text(
         text,
-        style: GoogleFonts.poppins(
+        style: appFont(
           fontSize: 11,
           fontWeight: FontWeight.w700,
           color: AppColors.textSecondary,
@@ -1578,10 +1579,10 @@ class _AuthScreenState extends State<AuthScreen>
       controller: controller,
       obscureText: isPassword ? obscure : false,
       keyboardType: keyboardType,
-      style: GoogleFonts.poppins(fontSize: 14, color: AppColors.textPrimary),
+      style: appFont(fontSize: 14, color: AppColors.textPrimary),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: GoogleFonts.poppins(
+        hintStyle: appFont(
             color: const Color(0xFFB0B7C3), fontSize: 14),
         prefixIcon: prefixIcon != null
             ? Icon(prefixIcon, color: const Color(0xFFB0B7C3), size: 20)
@@ -1635,7 +1636,7 @@ class _AuthScreenState extends State<AuthScreen>
                 const SizedBox(width: 6),
                 Text(
                   '+20',
-                  style: GoogleFonts.poppins(
+                  style: appFont(
                     fontWeight: FontWeight.w700,
                     fontSize: 14,
                     color: AppColors.textPrimary,
@@ -1651,11 +1652,11 @@ class _AuthScreenState extends State<AuthScreen>
             child: TextField(
               controller: controller,
               keyboardType: TextInputType.phone,
-              style: GoogleFonts.poppins(
+              style: appFont(
                   fontSize: 14, color: AppColors.textPrimary),
               decoration: InputDecoration(
                 hintText: '100 123 4567',
-                hintStyle: GoogleFonts.poppins(
+                hintStyle: appFont(
                     color: const Color(0xFFB0B7C3), fontSize: 14),
                 border: InputBorder.none,
                 contentPadding: const EdgeInsets.symmetric(
@@ -1690,7 +1691,7 @@ class _AuthScreenState extends State<AuthScreen>
                     color: Colors.white, strokeWidth: 2.5))
             : Text(
                 label,
-                style: GoogleFonts.poppins(
+                style: appFont(
                     fontSize: 15, fontWeight: FontWeight.w600),
               ),
       ),
@@ -1727,7 +1728,7 @@ class _AuthScreenState extends State<AuthScreen>
         children: [
           SizedBox(width: 22, height: 22, child: CustomPaint(painter: _GoogleLogoPainter())),
           const SizedBox(width: 8),
-          Text('Google', style: GoogleFonts.poppins(
+          Text('Google', style: appFont(
               color: AppColors.textPrimary, fontSize: 14, fontWeight: FontWeight.w500)),
         ],
       ),
@@ -1754,7 +1755,7 @@ class _AuthScreenState extends State<AuthScreen>
             child: const Icon(Icons.apple, color: Colors.white, size: 16),
           ),
           const SizedBox(width: 8),
-          Text('Apple', style: GoogleFonts.poppins(
+          Text('Apple', style: appFont(
               color: AppColors.textPrimary, fontSize: 14, fontWeight: FontWeight.w500)),
         ],
       ),

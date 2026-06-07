@@ -1,5 +1,6 @@
-import 'package:cached_network_image/cached_network_image.dart';
+﻿import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import '../utils/app_font.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shimmer/shimmer.dart';
 import '../constants/app_colors.dart';
@@ -84,7 +85,7 @@ class FeaturedPlaceCard extends StatelessWidget {
                               const SizedBox(width: 4),
                               Text(
                                 place.avgRating.toStringAsFixed(1),
-                                style: GoogleFonts.poppins(
+                                style: appFont(
                                     color: Colors.white,
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600),
@@ -101,7 +102,7 @@ class FeaturedPlaceCard extends StatelessWidget {
                           ),
                           child: Text(
                             'MOST RECOMMENDED',
-                            style: GoogleFonts.poppins(
+                            style: appFont(
                                 color: Colors.white,
                                 fontSize: 9,
                                 fontWeight: FontWeight.w700),
@@ -114,7 +115,7 @@ class FeaturedPlaceCard extends StatelessWidget {
                       place.getName(locale),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.poppins(
+                      style: appFont(
                           color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
                     ),
                     Row(
@@ -126,7 +127,7 @@ class FeaturedPlaceCard extends StatelessWidget {
                             place.governorate,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: GoogleFonts.poppins(color: Colors.white70, fontSize: 11),
+                            style: appFont(color: Colors.white70, fontSize: 11),
                           ),
                         ),
                       ],
@@ -234,7 +235,7 @@ class _NearbyPlaceCardState extends State<NearbyPlaceCard> {
                             widget.place.getName(widget.locale),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: GoogleFonts.poppins(
+                            style: appFont(
                                 fontWeight: FontWeight.bold, fontSize: 14,
                                 color: AppColors.textPrimary),
                           ),
@@ -260,7 +261,7 @@ class _NearbyPlaceCardState extends State<NearbyPlaceCard> {
                         const Icon(Icons.location_on, color: AppColors.accent, size: 13),
                         const SizedBox(width: 3),
                         Text(widget.place.governorate,
-                            style: GoogleFonts.poppins(color: AppColors.textSecondary, fontSize: 12)),
+                            style: appFont(color: AppColors.textSecondary, fontSize: 12)),
                       ],
                     ),
                     const SizedBox(height: 6),
@@ -268,7 +269,7 @@ class _NearbyPlaceCardState extends State<NearbyPlaceCard> {
                       widget.place.getDescription(widget.locale),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.poppins(
+                      style: appFont(
                           color: AppColors.textSecondary, fontSize: 12, height: 1.4),
                     ),
                     const SizedBox(height: 8),
@@ -277,7 +278,7 @@ class _NearbyPlaceCardState extends State<NearbyPlaceCard> {
                         _RatingBadge(rating: widget.place.avgRating, small: true),
                         const SizedBox(width: 6),
                         Text('(${widget.place.reviewCount})',
-                            style: GoogleFonts.poppins(
+                            style: appFont(
                                 color: AppColors.textLight, fontSize: 11)),
                         const Spacer(),
                         Container(
@@ -290,7 +291,7 @@ class _NearbyPlaceCardState extends State<NearbyPlaceCard> {
                           ),
                           child: Text(
                             widget.place.category,
-                            style: GoogleFonts.poppins(
+                            style: appFont(
                               fontSize: 10,
                               color: AppColors.categoryColors[widget.place.category] ??
                                   AppColors.primary,
@@ -369,7 +370,7 @@ class _RatingBadge extends StatelessWidget {
           const SizedBox(width: 3),
           Text(
             rating.toStringAsFixed(1),
-            style: GoogleFonts.poppins(
+            style: appFont(
                 color: Colors.white, fontSize: small ? 11 : 12, fontWeight: FontWeight.bold),
           ),
         ],

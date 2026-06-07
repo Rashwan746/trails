@@ -778,6 +778,40 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Don\'t have an account? Register'**
   String get dontHaveAccount;
+
+  // ── Home screen ────────────────────────────────────────────────────────
+  String get heroLine1;
+  String get heroLine2;
+  String get searchPlacesLabel;
+  String get searchSubLabel;
+  String get topPicks;
+  String get restaurants;
+  String get hotelsLabel;
+  String get nearbyGems;
+  String get discover;
+  String get more;
+  String get exploreEgypt;
+  String get searchDetailedHint;
+
+  // ── Map / Category labels ──────────────────────────────────────────────
+  String get attractions;
+  String get dining;
+  String get beaches;
+
+  // ── Profile / Settings ────────────────────────────────────────────────
+  String get preferences;
+  String get accountSettings;
+  String get pushNotifications;
+  String get locationAccess;
+  String get helpSupport;
+  String get appSettings;
+  String get logOut;
+  String get planYourJourney;
+  String get whileUsing;
+  String get travelEnthusiast;
+
+  // ── Misc ──────────────────────────────────────────────────────────────
+  String get mostRecommended;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

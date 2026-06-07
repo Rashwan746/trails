@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import '../utils/app_font.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
@@ -114,7 +115,7 @@ class _HomeScreenState extends State<HomeScreen>
               onRefresh: _load,
               child: CustomScrollView(
                 slivers: [
-                  _buildAppBar(user?.fullName ?? 'Traveler', isAr),
+                  _buildAppBar(user?.fullName ?? 'Traveler', isAr, l10n),
                   if (_loading)
                     const SliverFillRemaining(
                       child: Center(
@@ -126,26 +127,26 @@ class _HomeScreenState extends State<HomeScreen>
                     SliverFillRemaining(child: _buildError())
                   else ...[
                     // ── Featured ──────────────────────────────────────
-                    _buildSectionHeader('✨ Top Picks', seeAllLabel: l10n.seeAll, onSeeAll: () {
+                    _buildSectionHeader('✨ ${l10n.topPicks}', seeAllLabel: l10n.seeAll, onSeeAll: () {
                       Navigator.push(context, slideRightRoute(const SearchScreen()));
                     }),
                     _buildFeaturedList(isAr),
                     // ── Restaurants ───────────────────────────────────
                     if (_restaurants.isNotEmpty) ...[
-                      _buildSectionHeader('🍽️ Restaurants', seeAllLabel: 'See All', onSeeAll: () {
+                      _buildSectionHeader('🍽️ ${l10n.restaurants}', seeAllLabel: l10n.seeAll, onSeeAll: () {
                         Navigator.push(context, slideRightRoute(const SearchScreen(initialCategory: 'restaurant')));
                       }),
                       _buildHorizontalList(_restaurants, isAr),
                     ],
                     // ── Hotels ────────────────────────────────────────
                     if (_hotels.isNotEmpty) ...[
-                      _buildSectionHeader('🏨 Hotels', seeAllLabel: 'See All', onSeeAll: () {
+                      _buildSectionHeader('🏨 ${l10n.hotelsLabel}', seeAllLabel: l10n.seeAll, onSeeAll: () {
                         Navigator.push(context, slideRightRoute(const SearchScreen(initialCategory: 'hotel')));
                       }),
                       _buildHorizontalList(_hotels, isAr),
                     ],
                     // ── Nearby ────────────────────────────────────────
-                    _buildSectionHeader('🗺️ Nearby Gems', seeAllLabel: 'More', onSeeAll: () {
+                    _buildSectionHeader('🗺️ ${l10n.nearbyGems}', seeAllLabel: l10n.more, onSeeAll: () {
                       Navigator.push(context, slideRightRoute(const SearchScreen()));
                     }),
                     _buildNearbyList(isAr),
@@ -169,7 +170,7 @@ class _HomeScreenState extends State<HomeScreen>
           const SizedBox(height: 16),
           Text(
             'Could not load places',
-            style: GoogleFonts.poppins(
+            style: appFont(
                 color: AppColors.textSecondary, fontSize: 15),
           ),
           const SizedBox(height: 20),
@@ -183,7 +184,7 @@ class _HomeScreenState extends State<HomeScreen>
                   const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
             ),
             child: Text('Retry',
-                style: GoogleFonts.poppins(
+                style: appFont(
                     color: Colors.white, fontWeight: FontWeight.w600)),
           ),
         ],
@@ -191,9 +192,9 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
-  Widget _buildAppBar(String name, bool isAr) {
+  Widget _buildAppBar(String name, bool isAr, AppLocalizations l10n) {
     return SliverAppBar(
-      expandedHeight: 320,
+      expandedHeight: 192,
       floating: false,
       pinned: true,
       backgroundColor: Colors.black,
@@ -240,7 +241,7 @@ class _HomeScreenState extends State<HomeScreen>
             // 3. Content
             SafeArea(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+                padding: const EdgeInsets.fromLTRB(20, 2, 20, 0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -258,7 +259,7 @@ class _HomeScreenState extends State<HomeScreen>
                               const SizedBox(width: 4),
                               Text(
                                 'Cairo',
-                                style: GoogleFonts.poppins(
+                                style: appFont(
                                   color: Colors.white,
                                   fontSize: 14,
                                   fontWeight: FontWeight.w500,
@@ -307,11 +308,11 @@ class _HomeScreenState extends State<HomeScreen>
                         ),
                       ],
                     ),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: 4),
                     // Heading
                     Text(
-                      'Hey, Traveler! Tell us',
-                      style: GoogleFonts.poppins(
+                      l10n.heroLine1,
+                      style: appFont(
                         color: Colors.white,
                         fontSize: 21,
                         fontWeight: FontWeight.bold,
@@ -319,15 +320,15 @@ class _HomeScreenState extends State<HomeScreen>
                       ),
                     ),
                     Text(
-                      'where you want to go',
-                      style: GoogleFonts.poppins(
+                      l10n.heroLine2,
+                      style: appFont(
                         color: Colors.white,
                         fontSize: 21,
                         fontWeight: FontWeight.bold,
                         height: 1.2,
                       ),
                     ),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: 6),
                     // Search bar
                     GestureDetector(
                       onTap: () => Navigator.push(
@@ -353,16 +354,16 @@ class _HomeScreenState extends State<HomeScreen>
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
-                                    'Search places',
-                                    style: GoogleFonts.poppins(
+                                    l10n.searchPlacesLabel,
+                                    style: appFont(
                                       color: Colors.white,
                                       fontSize: 14,
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),
                                   Text(
-                                    'temples, food, or hotels....',
-                                    style: GoogleFonts.poppins(
+                                    l10n.searchSubLabel,
+                                    style: appFont(
                                       color: Colors.white54,
                                       fontSize: 11,
                                     ),
@@ -383,23 +384,23 @@ class _HomeScreenState extends State<HomeScreen>
                         ),
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 6),
                     // ── Category chips (below search) ──────────────
                     SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: Row(
                         children: [
-                          ('All',         null,         '🌍'),
-                          ('Historical',  'historical', '🏛️'),
-                          ('Beach',       'beach',      '🏖️'),
-                          ('Desert',      'desert',     '🏜️'),
-                          ('Museum',      'museum',     '🏺'),
-                          ('Religious',   'religious',  '🕌'),
-                          ('Nature',      'nature',     '🌿'),
-                          ('Market',      'market',     '🛍️'),
-                          ('Cruise',      'cruise',     '🚢'),
-                          ('Restaurants', 'restaurant', '🍽️'),
-                          ('Hotels',      'hotel',      '🏨'),
+                          (l10n.all,         null,         '🌍'),
+                          (l10n.historical,  'historical', '🏛️'),
+                          (l10n.beach,       'beach',      '🏖️'),
+                          (l10n.desert,      'desert',     '🏜️'),
+                          (l10n.museum,      'museum',     '🏺'),
+                          (l10n.religious,   'religious',  '🕌'),
+                          (l10n.nature,      'nature',     '🌿'),
+                          (l10n.market,      'market',     '🛍️'),
+                          (l10n.cruise,      'cruise',     '🚢'),
+                          (l10n.restaurants, 'restaurant', '🍽️'),
+                          (l10n.hotelsLabel, 'hotel',      '🏨'),
                         ].map((cat) {
                           final label = cat.$1;
                           final id    = cat.$2;
@@ -429,7 +430,7 @@ class _HomeScreenState extends State<HomeScreen>
                                   const SizedBox(width: 5),
                                   Text(
                                     label,
-                                    style: GoogleFonts.poppins(
+                                    style: appFont(
                                       fontSize: 12,
                                       color: Colors.white,
                                       fontWeight: FontWeight.w500,
@@ -464,7 +465,7 @@ class _HomeScreenState extends State<HomeScreen>
           children: [
             Text(
               title,
-              style: GoogleFonts.poppins(
+              style: appFont(
                 fontSize: 17,
                 fontWeight: FontWeight.bold,
                 color: AppColors.textPrimary,
@@ -475,7 +476,7 @@ class _HomeScreenState extends State<HomeScreen>
                 onTap: onSeeAll,
                 child: Text(
                   seeAllLabel ?? 'See All',
-                  style: GoogleFonts.poppins(
+                  style: appFont(
                     fontSize: 13,
                     color: AppColors.primary,
                     fontWeight: FontWeight.w600,

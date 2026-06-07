@@ -1,5 +1,6 @@
-import 'package:cached_network_image/cached_network_image.dart';
+﻿import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import '../utils/app_font.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../constants/app_colors.dart';
 import '../l10n/app_localizations.dart';
@@ -62,7 +63,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         automaticallyImplyLeading: false,
         title: Text(
           l10n.favorites,
-          style: GoogleFonts.poppins(
+          style: appFont(
             fontWeight: FontWeight.bold,
             fontSize: 17,
             color: AppColors.textPrimary,
@@ -131,7 +132,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
               ),
               child: Text(
                 f.$1 == 'All' ? l10n.all : f.$1,
-                style: GoogleFonts.poppins(
+                style: appFont(
                   fontSize: 13,
                   color: isSelected
                       ? Colors.white
@@ -159,7 +160,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
             const SizedBox(height: 16),
             Text(
               'Could not load favorites',
-              style: GoogleFonts.poppins(
+              style: appFont(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   color: AppColors.textPrimary),
@@ -168,7 +169,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
             Text(
               _error ?? 'Please check your connection and try again.',
               textAlign: TextAlign.center,
-              style: GoogleFonts.poppins(
+              style: appFont(
                   color: AppColors.textSecondary, fontSize: 13),
             ),
             const SizedBox(height: 20),
@@ -176,7 +177,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
               onPressed: _load,
               icon: const Icon(Icons.refresh_rounded, color: Colors.white, size: 18),
               label: Text('Retry',
-                  style: GoogleFonts.poppins(
+                  style: appFont(
                       color: Colors.white, fontWeight: FontWeight.w600)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
@@ -204,7 +205,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           const SizedBox(height: 16),
           Text(
             l10n.noFavorites,
-            style: GoogleFonts.poppins(
+            style: appFont(
               fontSize: 20,
               fontWeight: FontWeight.bold,
               color: AppColors.textPrimary,
@@ -214,7 +215,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           Text(
             'Tap ❤️ on any place to save it here',
             textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(color: AppColors.textSecondary),
+            style: appFont(color: AppColors.textSecondary),
           ),
         ],
       ),
@@ -283,7 +284,7 @@ class _FavoriteCard extends StatelessWidget {
                         children: [
                           Text(
                             'Saved',
-                            style: GoogleFonts.poppins(
+                            style: appFont(
                               color: Colors.white,
                               fontSize: 11.5,
                               fontWeight: FontWeight.w600,
@@ -307,7 +308,7 @@ class _FavoriteCard extends StatelessWidget {
                   children: [
                     Text(
                       place.getName('en'),
-                      style: GoogleFonts.poppins(
+                      style: appFont(
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
                         color: AppColors.textPrimary,
@@ -321,7 +322,7 @@ class _FavoriteCard extends StatelessWidget {
                         const SizedBox(width: 3),
                         Text(
                           place.governorate,
-                          style: GoogleFonts.poppins(
+                          style: appFont(
                             fontSize: 12,
                             color: AppColors.textSecondary,
                           ),
@@ -332,7 +333,7 @@ class _FavoriteCard extends StatelessWidget {
                         const SizedBox(width: 3),
                         Text(
                           place.avgRating.toStringAsFixed(1),
-                          style: GoogleFonts.poppins(
+                          style: appFont(
                             fontSize: 12,
                             color: AppColors.textPrimary,
                             fontWeight: FontWeight.w600,

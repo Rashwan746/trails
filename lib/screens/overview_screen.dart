@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import '../utils/app_font.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -233,7 +234,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(_place.getName('en'),
-                        style: GoogleFonts.poppins(
+                        style: appFont(
                             fontSize: 22, fontWeight: FontWeight.bold,
                             color: AppColors.textPrimary)),
                     Text(_place.getName('ar'),
@@ -252,15 +253,15 @@ class _OverviewScreenState extends State<OverviewScreen> {
               const Icon(Icons.star_rounded, color: AppColors.starColor, size: 20),
               const SizedBox(width: 4),
               Text(_place.avgRating.toStringAsFixed(1),
-                  style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 15)),
+                  style: appFont(fontWeight: FontWeight.bold, fontSize: 15)),
               const SizedBox(width: 6),
               Text('(${_place.reviewCount} reviews)',
-                  style: GoogleFonts.poppins(color: AppColors.textSecondary, fontSize: 13)),
+                  style: appFont(color: AppColors.textSecondary, fontSize: 13)),
               const Spacer(),
               const Icon(Icons.location_on, color: AppColors.accent, size: 16),
               const SizedBox(width: 4),
               Text(_place.governorate,
-                  style: GoogleFonts.poppins(color: AppColors.textSecondary, fontSize: 13)),
+                  style: appFont(color: AppColors.textSecondary, fontSize: 13)),
             ],
           ),
 
@@ -308,7 +309,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
                   children: [
                     Text(
                       _place.governorate,
-                      style: GoogleFonts.poppins(
+                      style: appFont(
                         fontSize: 13.5,
                         fontWeight: FontWeight.w600,
                         color: AppColors.textPrimary,
@@ -316,7 +317,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
                     ),
                     Text(
                       '${_place.governorate} Governorate, Egypt',
-                      style: GoogleFonts.poppins(
+                      style: appFont(
                         fontSize: 12,
                         color: AppColors.textSecondary,
                       ),
@@ -348,7 +349,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
                   children: [
                     Text(
                       '${_place.openingHours.open} - ${_place.openingHours.close}',
-                      style: GoogleFonts.poppins(
+                      style: appFont(
                         fontSize: 13.5,
                         fontWeight: FontWeight.w600,
                         color: AppColors.textPrimary,
@@ -356,7 +357,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
                     ),
                     Text(
                       _place.openingHours.days,
-                      style: GoogleFonts.poppins(
+                      style: appFont(
                         fontSize: 12,
                         color: AppColors.textSecondary,
                       ),
@@ -372,10 +373,10 @@ class _OverviewScreenState extends State<OverviewScreen> {
           const SizedBox(height: 16),
 
           // About
-          Text(l10n.about, style: GoogleFonts.poppins(fontSize: 17, fontWeight: FontWeight.bold)),
+          Text(l10n.about, style: appFont(fontSize: 17, fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
           Text(_place.getDescription('en'),
-              style: GoogleFonts.poppins(
+              style: appFont(
                   color: AppColors.textSecondary, fontSize: 14, height: 1.7)),
 
           const SizedBox(height: 16),
@@ -393,7 +394,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(t,
-                            style: GoogleFonts.poppins(
+                            style: appFont(
                                 fontSize: 12, color: AppColors.primary,
                                 fontWeight: FontWeight.w500)),
                       ))
@@ -421,10 +422,10 @@ class _OverviewScreenState extends State<OverviewScreen> {
                     const Icon(Icons.map_rounded, color: AppColors.secondary, size: 36),
                     const SizedBox(height: 8),
                     Text('View on Map',
-                        style: GoogleFonts.poppins(
+                        style: appFont(
                             color: AppColors.secondary, fontWeight: FontWeight.w600)),
                     Text('${_place.location.latitude.toStringAsFixed(4)}, ${_place.location.longitude.toStringAsFixed(4)}',
-                        style: GoogleFonts.poppins(
+                        style: appFont(
                             color: AppColors.textSecondary, fontSize: 11)),
                   ],
                 ),
@@ -438,12 +439,12 @@ class _OverviewScreenState extends State<OverviewScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(l10n.reviews, style: GoogleFonts.poppins(fontSize: 17, fontWeight: FontWeight.bold)),
+              Text(l10n.reviews, style: appFont(fontSize: 17, fontWeight: FontWeight.bold)),
               TextButton(
                 onPressed: () => Navigator.push(context,
                     MaterialPageRoute(builder: (_) => ReviewsScreen(place: _place))),
                 child: Text(l10n.seeAll,
-                    style: GoogleFonts.poppins(color: AppColors.primary, fontWeight: FontWeight.w600)),
+                    style: appFont(color: AppColors.primary, fontWeight: FontWeight.w600)),
               ),
             ],
           ),
@@ -464,7 +465,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
                     children: [
                       Text(
                         _place.avgRating.toStringAsFixed(1),
-                        style: GoogleFonts.poppins(
+                        style: appFont(
                           fontSize: 44,
                           fontWeight: FontWeight.bold,
                           color: AppColors.textPrimary,
@@ -483,7 +484,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
                       const SizedBox(height: 2),
                       Text(
                         '${_place.reviewCount} reviews',
-                        style: GoogleFonts.poppins(
+                        style: appFont(
                           fontSize: 11,
                           color: AppColors.textSecondary,
                         ),
@@ -512,7 +513,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 child: Text('No reviews yet. Be the first!',
-                    style: GoogleFonts.poppins(color: AppColors.textSecondary, fontSize: 13)),
+                    style: appFont(color: AppColors.textSecondary, fontSize: 13)),
               ),
             ),
           ],
@@ -531,7 +532,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
         children: [
-          Text('$stars', style: GoogleFonts.poppins(fontSize: 11, color: AppColors.textSecondary)),
+          Text('$stars', style: appFont(fontSize: 11, color: AppColors.textSecondary)),
           const SizedBox(width: 2),
           const Icon(Icons.star_rounded, size: 11, color: AppColors.starColor),
           const SizedBox(width: 5),
@@ -552,7 +553,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
             child: Text(
               '$count',
               textAlign: TextAlign.right,
-              style: GoogleFonts.poppins(
+              style: appFont(
                   fontSize: 11,
                   color: AppColors.textPrimary,
                   fontWeight: FontWeight.w600),
@@ -579,7 +580,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
                 onPressed: _openDirections,
                 icon: const Icon(Icons.directions, color: AppColors.secondary),
                 label: Text(l10n.getDirections,
-                    style: GoogleFonts.poppins(color: AppColors.secondary, fontWeight: FontWeight.w600)),
+                    style: appFont(color: AppColors.secondary, fontWeight: FontWeight.w600)),
                 style: OutlinedButton.styleFrom(
                   side: const BorderSide(color: AppColors.secondary),
                   padding: const EdgeInsets.symmetric(vertical: 14),
@@ -594,7 +595,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
                     MaterialPageRoute(builder: (_) => WriteReviewScreen(place: _place))),
                 icon: const Icon(Icons.star_outline, color: Colors.white, size: 18),
                 label: Text('Review',
-                    style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w600)),
+                    style: appFont(color: Colors.white, fontWeight: FontWeight.w600)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   padding: const EdgeInsets.symmetric(vertical: 14),
@@ -626,7 +627,7 @@ extension _OverviewHelpers on _OverviewScreenState {
           const SizedBox(width: 5),
           Text(
             label,
-            style: GoogleFonts.poppins(
+            style: appFont(
               fontSize: 12,
               color: const Color(0xFF16A34A),
               fontWeight: FontWeight.w600,
@@ -653,7 +654,7 @@ class _CategoryBadge extends StatelessWidget {
       ),
       child: Text(
         category.toUpperCase(),
-        style: GoogleFonts.poppins(color: color, fontSize: 10, fontWeight: FontWeight.bold),
+        style: appFont(color: color, fontSize: 10, fontWeight: FontWeight.bold),
       ),
     );
   }
@@ -686,7 +687,7 @@ class _ReviewTile extends StatelessWidget {
                     : null,
                 child: review.user.avatarUrl.isEmpty
                     ? Text(review.user.initials,
-                        style: GoogleFonts.poppins(
+                        style: appFont(
                             color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold))
                     : null,
               ),
@@ -698,7 +699,7 @@ class _ReviewTile extends StatelessWidget {
                     Row(
                       children: [
                         Text(review.user.fullName,
-                            style: GoogleFonts.poppins(
+                            style: appFont(
                                 fontWeight: FontWeight.w600, fontSize: 13)),
                         if (review.user.country?.isNotEmpty == true) ...[
                           const SizedBox(width: 5),
@@ -730,7 +731,7 @@ class _ReviewTile extends StatelessWidget {
           Text(review.text,
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
-              style: GoogleFonts.poppins(color: AppColors.textSecondary, fontSize: 13)),
+              style: appFont(color: AppColors.textSecondary, fontSize: 13)),
         ],
       ),
     );

@@ -1,5 +1,6 @@
-import 'dart:ui';
+﻿import 'dart:ui';
 import 'package:flutter/material.dart';
+import '../utils/app_font.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
@@ -88,7 +89,7 @@ class _MainShellState extends State<MainShell> with TickerProviderStateMixin {
 
   Widget _buildNavBar(AppLocalizations l10n, double bottomPadding) {
     final items = [
-      _NavItem(icon: Icons.explore_rounded,  label: 'Discover'),
+      _NavItem(icon: Icons.explore_rounded,  label: l10n.discover),
       _NavItem(icon: Icons.favorite_rounded, label: l10n.favorites),
       _NavItem(icon: Icons.map_rounded,      label: l10n.map),
       _NavItem(icon: Icons.person_rounded,   label: l10n.profile),
@@ -224,7 +225,7 @@ class _MainShellState extends State<MainShell> with TickerProviderStateMixin {
           const SizedBox(height: 3),
           AnimatedDefaultTextStyle(
             duration: const Duration(milliseconds: 200),
-            style: GoogleFonts.poppins(
+            style: appFont(
               fontSize: 10,
               fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
               color: selected
@@ -253,7 +254,7 @@ class _AiIcon extends StatelessWidget {
             color: Colors.white.withOpacity(0.25), size: 42),
         // AI text
         Text('AI',
-            style: GoogleFonts.poppins(
+            style: appFont(
               color: Colors.white,
               fontSize: 17,
               fontWeight: FontWeight.bold,

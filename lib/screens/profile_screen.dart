@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import '../utils/app_font.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
@@ -47,7 +48,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('Language',
-                    style: GoogleFonts.poppins(
+                    style: appFont(
                         fontSize: 18, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 16),
                 _langOption('English (US)', !isAr, () async {
@@ -79,7 +80,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _langOption(String label, bool selected, VoidCallback onTap) {
     return ListTile(
       title: Text(label,
-          style: GoogleFonts.poppins(
+          style: appFont(
               fontSize: 15,
               fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
               color: selected ? AppColors.primary : AppColors.textPrimary)),
@@ -106,7 +107,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Currency',
-                style: GoogleFonts.poppins(
+                style: appFont(
                     fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
             ...currencies.map((c) {
@@ -114,7 +115,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               return Column(children: [
                 ListTile(
                   title: Text(c,
-                      style: GoogleFonts.poppins(
+                      style: appFont(
                           fontSize: 15,
                           fontWeight: isSel ? FontWeight.w600 : FontWeight.normal,
                           color: isSel ? AppColors.primary : AppColors.textPrimary)),
@@ -161,7 +162,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text('Interests',
-                  style: GoogleFonts.poppins(
+                  style: appFont(
                       fontSize: 18, fontWeight: FontWeight.bold)),
               const SizedBox(height: 16),
               Wrap(
@@ -181,7 +182,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             color: isSel ? AppColors.primary : AppColors.divider),
                       ),
                       child: Text(interest,
-                          style: GoogleFonts.poppins(
+                          style: appFont(
                             fontSize: 13,
                             color: isSel ? Colors.white : AppColors.textSecondary,
                             fontWeight: isSel ? FontWeight.w600 : FontWeight.normal,
@@ -209,7 +210,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     elevation: 0,
                   ),
                   child: Text('Save',
-                      style: GoogleFonts.poppins(
+                      style: appFont(
                           color: Colors.white, fontWeight: FontWeight.w600,
                           fontSize: 15)),
                 ),
@@ -246,18 +247,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('Location Access',
-                    style: GoogleFonts.poppins(
+                    style: appFont(
                         fontSize: 18, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
                 Text('Allow Discover Egypt to access your location',
-                    style: GoogleFonts.poppins(
+                    style: appFont(
                         fontSize: 13, color: AppColors.textSecondary)),
                 const SizedBox(height: 16),
                 for (final opt in ['Always', 'While Using', 'Never'])
                   Column(children: [
                     ListTile(
                       title: Text(opt,
-                          style: GoogleFonts.poppins(
+                          style: appFont(
                               fontSize: 15,
                               fontWeight: selected == opt
                                   ? FontWeight.w600
@@ -285,7 +286,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       elevation: 0,
                     ),
                     child: Text('Save',
-                        style: GoogleFonts.poppins(
+                        style: appFont(
                             color: Colors.white, fontWeight: FontWeight.w600)),
                   ),
                 ),
@@ -325,7 +326,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const Icon(Icons.help_outline_rounded, color: AppColors.primary),
                 const SizedBox(width: 8),
                 Text('Help & Support',
-                    style: GoogleFonts.poppins(
+                    style: appFont(
                         fontSize: 18, fontWeight: FontWeight.bold)),
               ]),
               const SizedBox(height: 16),
@@ -336,7 +337,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   separatorBuilder: (_, __) => const Divider(),
                   itemBuilder: (_, i) => ExpansionTile(
                     title: Text(faqs[i].$1,
-                        style: GoogleFonts.poppins(
+                        style: appFont(
                             fontSize: 14, fontWeight: FontWeight.w600)),
                     iconColor: AppColors.primary,
                     collapsedIconColor: AppColors.textLight,
@@ -344,7 +345,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Padding(
                         padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
                         child: Text(faqs[i].$2,
-                            style: GoogleFonts.poppins(
+                            style: appFont(
                                 fontSize: 13, color: AppColors.textSecondary,
                                 height: 1.5)),
                       ),
@@ -381,19 +382,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
       builder: (_) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text('Log Out',
-            style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
+            style: appFont(fontWeight: FontWeight.bold)),
         content: Text('Are you sure you want to log out?',
-            style: GoogleFonts.poppins(color: AppColors.textSecondary)),
+            style: appFont(color: AppColors.textSecondary)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
             child: Text('Cancel',
-                style: GoogleFonts.poppins(color: AppColors.textSecondary)),
+                style: appFont(color: AppColors.textSecondary)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             child: Text('Log Out',
-                style: GoogleFonts.poppins(
+                style: appFont(
                     color: Colors.red, fontWeight: FontWeight.w600)),
           ),
         ],
@@ -432,7 +433,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               )
             : null,
         title: Text('Profile',
-            style: GoogleFonts.poppins(
+            style: appFont(
                 color: AppColors.textPrimary,
                 fontWeight: FontWeight.bold, fontSize: 17)),
         centerTitle: true,
@@ -440,7 +441,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           TextButton(
             onPressed: _showEditProfileSheet,
             child: Text('Edit',
-                style: GoogleFonts.poppins(
+                style: appFont(
                     color: AppColors.primary,
                     fontWeight: FontWeight.w600, fontSize: 15)),
           ),
@@ -493,12 +494,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
             // ── Name ──────────────────────────────────────────────────
             Text(user.fullName,
-                style: GoogleFonts.poppins(
+                style: appFont(
                     fontSize: 22, fontWeight: FontWeight.bold,
                     color: AppColors.textPrimary)),
             const SizedBox(height: 4),
             Text('Exploring $city  •  Member since $memberYear',
-                style: GoogleFonts.poppins(
+                style: appFont(
                     color: AppColors.textSecondary, fontSize: 13)),
 
             const SizedBox(height: 12),
@@ -516,7 +517,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   const Icon(Icons.verified_rounded, color: Colors.white, size: 16),
                   const SizedBox(width: 6),
                   Text('Travel Enthusiast',
-                      style: GoogleFonts.poppins(
+                      style: appFont(
                           color: Colors.white, fontSize: 13,
                           fontWeight: FontWeight.w600)),
                 ],
@@ -620,7 +621,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       color: Colors.red.shade400, size: 18),
                   const SizedBox(width: 8),
                   Text('Log Out',
-                      style: GoogleFonts.poppins(
+                      style: appFont(
                           color: Colors.red.shade400,
                           fontSize: 15,
                           fontWeight: FontWeight.w600)),
@@ -640,7 +641,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       color: AppColors.primary,
       child: Center(
         child: Text(initials,
-            style: GoogleFonts.poppins(
+            style: appFont(
                 color: Colors.white, fontSize: 30,
                 fontWeight: FontWeight.bold)),
       ),
@@ -653,7 +654,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Align(
         alignment: Alignment.centerLeft,
         child: Text(title,
-            style: GoogleFonts.poppins(
+            style: appFont(
                 fontSize: 11, fontWeight: FontWeight.w700,
                 color: AppColors.textSecondary, letterSpacing: 1.0)),
       ),
@@ -708,13 +709,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(width: 14),
             Expanded(
               child: Text(label,
-                  style: GoogleFonts.poppins(
+                  style: appFont(
                       fontSize: 14.5, fontWeight: FontWeight.w500,
                       color: AppColors.textPrimary)),
             ),
             if (value.isNotEmpty)
               Text(value,
-                  style: GoogleFonts.poppins(
+                  style: appFont(
                       fontSize: 13, color: AppColors.textSecondary)),
             const SizedBox(width: 4),
             const Icon(Icons.chevron_right_rounded,
@@ -748,7 +749,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(width: 14),
           Expanded(
             child: Text(label,
-                style: GoogleFonts.poppins(
+                style: appFont(
                     fontSize: 14.5, fontWeight: FontWeight.w500,
                     color: AppColors.textPrimary)),
           ),
@@ -786,13 +787,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               const SizedBox(height: 24),
               Text('Join Discover Egypt',
-                  style: GoogleFonts.poppins(
+                  style: appFont(
                       fontSize: 24, fontWeight: FontWeight.bold,
                       color: AppColors.textPrimary),
                   textAlign: TextAlign.center),
               const SizedBox(height: 10),
               Text('Create an account to save favorites,\nwrite reviews, and more.',
-                  style: GoogleFonts.poppins(
+                  style: appFont(
                       fontSize: 14, color: AppColors.textSecondary, height: 1.6),
                   textAlign: TextAlign.center),
               const SizedBox(height: 36),
@@ -809,7 +810,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     elevation: 0,
                   ),
                   child: Text('Create Account',
-                      style: GoogleFonts.poppins(
+                      style: appFont(
                           color: Colors.white, fontSize: 16,
                           fontWeight: FontWeight.w600)),
                 ),
@@ -819,7 +820,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 onPressed: () => Navigator.push(context,
                     MaterialPageRoute(builder: (_) => const AuthScreen())),
                 child: Text('Already have an account? Log In',
-                    style: GoogleFonts.poppins(
+                    style: appFont(
                         color: AppColors.primary, fontSize: 14,
                         fontWeight: FontWeight.w500)),
               ),
@@ -905,7 +906,7 @@ class _EditProfilePageState extends State<_EditProfilePage> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text('Edit Profile',
-            style: GoogleFonts.poppins(
+            style: appFont(
                 color: AppColors.textPrimary,
                 fontWeight: FontWeight.bold, fontSize: 17)),
         centerTitle: true,
@@ -954,7 +955,7 @@ class _EditProfilePageState extends State<_EditProfilePage> {
             TextButton(
               onPressed: () {},
               child: Text('Change Profile Photo',
-                  style: GoogleFonts.poppins(
+                  style: appFont(
                       color: AppColors.primary,
                       fontWeight: FontWeight.w600, fontSize: 14)),
             ),
@@ -1007,7 +1008,7 @@ class _EditProfilePageState extends State<_EditProfilePage> {
                         child: CircularProgressIndicator(
                             color: Colors.white, strokeWidth: 2.5))
                     : Text('Save Changes',
-                        style: GoogleFonts.poppins(
+                        style: appFont(
                             color: Colors.white,
                             fontWeight: FontWeight.w600,
                             fontSize: 16)),
@@ -1026,7 +1027,7 @@ class _EditProfilePageState extends State<_EditProfilePage> {
       color: AppColors.primary,
       child: Center(
         child: Text(widget.user.initials,
-            style: GoogleFonts.poppins(
+            style: appFont(
                 color: Colors.white, fontSize: 30,
                 fontWeight: FontWeight.bold)),
       ),
@@ -1037,7 +1038,7 @@ class _EditProfilePageState extends State<_EditProfilePage> {
     return Align(
       alignment: Alignment.centerLeft,
       child: Text(text,
-          style: GoogleFonts.poppins(
+          style: appFont(
               fontSize: 11, fontWeight: FontWeight.w700,
               color: AppColors.textSecondary, letterSpacing: 0.8)),
     );
@@ -1052,10 +1053,10 @@ class _EditProfilePageState extends State<_EditProfilePage> {
     return TextField(
       controller: ctrl,
       keyboardType: keyboardType,
-      style: GoogleFonts.poppins(fontSize: 15, color: AppColors.textPrimary),
+      style: appFont(fontSize: 15, color: AppColors.textPrimary),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: GoogleFonts.poppins(
+        hintStyle: appFont(
             color: AppColors.textLight, fontSize: 15),
         suffixIcon: suffix,
         filled: true,
